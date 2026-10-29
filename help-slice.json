@@ -3,7 +3,7 @@
   "language": "node",
   "package": {
     "name": "@slen/sdk",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "manifest": "package.json",
     "runtime": {
       "name": "node",

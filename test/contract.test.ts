@@ -1,4 +1,4 @@
-import ts from 'typescript';
+import ts from 'typescript-api';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { parse } from 'yaml';
 import { apiBase, resolveConfig } from '../src/config.js';

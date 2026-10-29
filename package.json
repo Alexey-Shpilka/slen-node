@@ -1,6 +1,6 @@
 {
   "name": "@slen/sdk",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Slen TypeScript SDK — run flows and read their outcome, manage end customers and their credits, verify webhooks.",
   "license": "MIT",
   "author": "Alexey Shpilka",
@@ -39,8 +39,8 @@
   },
   "scripts": {
     "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\"",
-    "build": "npm run clean && tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json && node scripts/finish-build.mjs",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "build": "npm run clean && node node_modules/typescript/bin/tsc -p tsconfig.esm.json && node node_modules/typescript/bin/tsc -p tsconfig.cjs.json && node scripts/finish-build.mjs",
+    "typecheck": "node node_modules/typescript/bin/tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "floor": "node scripts/floor.mjs",
     "prepare": "npm run build"
@@ -62,7 +62,8 @@
     }
   },
   "devDependencies": {
-    "typescript": "^5.7.3",
+    "typescript": "^7.0.2",
+    "typescript-api": "npm:typescript@~6.0.3",
     "vitest": "^3.0.5",
     "yaml": "^2.9.1"
   }

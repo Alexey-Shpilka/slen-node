@@ -6,9 +6,9 @@ The CI and the release of `@slen/sdk`. No job reads a secret: a pull request fro
 ## Key Files
 | File | Description |
 |------|-------------|
-| `workflows/ci.yml` | `typescript` (Node 22: `npm ci`, typecheck, tests, build, the help slice `--check`, `npm pack --dry-run`) and `typescript-floor` (the built `dist/` loaded on Node 20.3.0 by `scripts/floor.mjs`); also `workflow_call`, for the release |
+| `workflows/ci.yml` | `typescript` (Node 22: `npm ci`, typecheck, tests, build, the help slice `--check`, `npm pack --dry-run`) and `typescript-floor` (the built `dist/` loaded on Node 20.3.0 by `scripts/floor.mjs`) and `typescript-consumer` (the help examples compiled against the packed types on TypeScript 5.0 and 7 by `scripts/consumer.mjs`); also `workflow_call`, for the release |
 | `workflows/release.yml` | on a pushed tag `v*`: `gates` (`ci.yml`, called) on the tag's commit, then `publish` — the tag checked against `master` and the version, `npm ci --ignore-scripts`, `npm publish` by trusted publishing |
-| `dependabot.yml` | weekly: the pinned actions, and the npm toolchain |
+| `dependabot.yml` | weekly: the pinned actions, and the npm toolchain; minors and patches in one PR per ecosystem, the majors of `typescript`, `typescript-api` and `vitest` ignored — they change the build or the suite, which is an iteration's work |
 
 ## For AI Agents
 - **Every action is pinned to a commit**, with its version in a comment; Dependabot moves both. `permissions: contents: read`, plus `id-token: write` on `publish` alone; every checkout is `persist-credentials: false`.

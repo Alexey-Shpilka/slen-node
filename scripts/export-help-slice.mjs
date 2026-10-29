@@ -82,7 +82,8 @@ function sorted(texts) {
 
 function compiler() {
   try {
-    return createRequire(MANIFEST)('typescript');
+    // TypeScript 7 has no compiler API to require; its AST is read with 6.
+    return createRequire(MANIFEST)('typescript-api');
   } catch (error) {
     throw new Error(
       'export-help-slice: the TypeScript compiler is not installed — run `npm ci` first.',

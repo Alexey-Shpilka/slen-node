@@ -1,4 +1,4 @@
-import ts from 'typescript';
+import ts from 'typescript-api';
 import { describe, expect, it } from 'vitest';
 import { resolveConfig, type SlenConfig } from '../src/config.js';
 import * as published from '../src/index.js';
