@@ -1,0 +1,41 @@
+{
+  "id": "uncertain",
+  "status": "ready",
+  "summary": "An unknown outcome and what to do about it: execute() raises the typed error of a 504 operation_uncertain, which the example catches and does not send again under a new key; the same request repeated under its own key runs nothing and is answered with the execution, uncertain, with the same code.",
+  "languages": ["node", "php"],
+  "regions": ["client", "call", "repeat"],
+  "responses": [
+    {
+      "status": 504,
+      "body": {
+        "error": {
+          "code": "operation_uncertain",
+          "message": "OpenAI did not answer in time: cURL error 28: Operation timed out after 60001 milliseconds with 0 bytes received",
+          "request_id": "5b8e2f17-9c3a-4d61-8e0b-7a4c2d9f1e36"
+        }
+      }
+    },
+    {
+      "status": 200,
+      "body": {
+        "data": {
+          "execution_id": "74443702163234816",
+          "status": "uncertain",
+          "operation": "generate_email",
+          "output": null,
+          "error": {
+            "code": "operation_uncertain",
+            "message": "The provider did not answer in time, so whether the call was made is not known"
+          },
+          "error_code": "operation_uncertain",
+          "error_message": "The provider did not answer in time, so whether the call was made is not known",
+          "cost": { "estimated": "0.00412500", "actual": null },
+          "cache": { "hit": false, "cached_at": null },
+          "replayed": true,
+          "waiting_on": null,
+          "trace_url": "/v1/executions/74443702163234816"
+        }
+      }
+    }
+  ]
+}

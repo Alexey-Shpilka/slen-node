@@ -1,0 +1,41 @@
+{
+  "id": "errors",
+  "status": "ready",
+  "summary": "A refusal in its two forms: execute() raises the typed error of a 402 budget_exceeded, which the example catches by type and branches on by code; the same request repeated under its key is answered with the execution, rejected, with the same code.",
+  "languages": ["node", "php"],
+  "regions": ["client", "catch", "repeat"],
+  "responses": [
+    {
+      "status": 402,
+      "body": {
+        "error": {
+          "code": "budget_exceeded",
+          "message": "Budget 74438200973595137 (monthly) exceeded",
+          "request_id": "7c2e9a41-3b8d-4f6a-9e15-c04d2b7a8f63"
+        }
+      }
+    },
+    {
+      "status": 200,
+      "body": {
+        "data": {
+          "execution_id": "74438200973594900",
+          "status": "rejected",
+          "operation": "generate_email",
+          "output": null,
+          "error": {
+            "code": "budget_exceeded",
+            "message": "Budget 74438200973595137 (monthly) exceeded"
+          },
+          "error_code": "budget_exceeded",
+          "error_message": "Budget 74438200973595137 (monthly) exceeded",
+          "cost": { "estimated": "0.00061560", "actual": null },
+          "cache": { "hit": false, "cached_at": null },
+          "replayed": true,
+          "waiting_on": null,
+          "trace_url": "/v1/executions/74438200973594900"
+        }
+      }
+    }
+  ]
+}

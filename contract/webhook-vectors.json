@@ -1,0 +1,399 @@
+{
+    "description": "Webhook signature vectors, signed by the backend's own WebhookSigner::sign(). `valid` is the answer of webhooks.verify(); `reason` is the reason of its refusal (and of the WebhookSignature error of constructEvent()); `event` is what constructEvent() reads from a valid one, null when the body is not an event (webhook_payload_invalid). `now` is unix seconds; `header` null means the request has none.",
+    "source": "backend v26/backend a72a940: App\\Modules\\Webhook\\Services\\Signing\\WebhookSigner::sign(); bodies encoded as WebhookDeliveryContextResolver encodes them",
+    "header_name": "Slen-Signature",
+    "secret": "whsec_v26_contract_vectors_7f3a91c2",
+    "tolerance_seconds": 300,
+    "cases": [
+        {
+            "name": "execution.finished: signed now",
+            "payload": "{\"id\":\"74438200973594801\",\"type\":\"execution.finished\",\"created_at\":\"2026-10-17T12:00:00+00:00\",\"data\":{\"execution_id\":\"74438200973594700\",\"flow_id\":\"74438200973590001\",\"operation\":\"support.reply\",\"status\":\"completed\",\"error_code\":null}}",
+            "header": "t=1792238400,v1=d90c1b78be2a0b86c06059a6dcbf096bd9b3d72b81282c597b744653fad473a9",
+            "now": 1792238400,
+            "valid": true,
+            "reason": null,
+            "event": {
+                "id": "74438200973594801",
+                "type": "execution.finished"
+            }
+        },
+        {
+            "name": "execution.finished, rejected: signed now",
+            "payload": "{\"id\":\"74438200973594802\",\"type\":\"execution.finished\",\"created_at\":\"2026-10-17T12:00:00+00:00\",\"data\":{\"execution_id\":\"74438200973594701\",\"flow_id\":\"74438200973590001\",\"operation\":\"support.reply\",\"status\":\"rejected\",\"error_code\":\"budget_exceeded\"}}",
+            "header": "t=1792238400,v1=8ca8cb8a4d0070562c282a0a86e97dfb8b54c95f67d5d90f4803819b0a753b86",
+            "now": 1792238400,
+            "valid": true,
+            "reason": null,
+            "event": {
+                "id": "74438200973594802",
+                "type": "execution.finished"
+            }
+        },
+        {
+            "name": "customer.balance_low: signed now",
+            "payload": "{\"id\":\"74438200973594803\",\"type\":\"customer.balance_low\",\"created_at\":\"2026-10-17T12:00:00+00:00\",\"data\":{\"customer_account_id\":\"74438200973580011\",\"project_id\":\"74438200973570001\",\"external_user_id\":\"ada@example.com\",\"credit_type\":\"default\",\"balance\":\"4.5000\",\"reserved\":\"0.5000\",\"available\":\"4.0000\",\"threshold\":\"5.0000\"}}",
+            "header": "t=1792238400,v1=79d1917e247c2b836eb7cb158539bdcab7a064489b3a84b4db040aec4a93b89c",
+            "now": 1792238400,
+            "valid": true,
+            "reason": null,
+            "event": {
+                "id": "74438200973594803",
+                "type": "customer.balance_low"
+            }
+        },
+        {
+            "name": "approval.requested: signed now",
+            "payload": "{\"id\":\"74438200973594804\",\"type\":\"approval.requested\",\"created_at\":\"2026-10-17T12:00:00+00:00\",\"data\":{\"approval_id\":\"74438200973560021\",\"execution_id\":\"74438200973594702\",\"flow_id\":\"74438200973590002\",\"node_key\":\"approve_refund\",\"operation_code\":\"support.refund\",\"note\":\"Повернення понад ліміт — перевірте ✓\",\"expires_at\":\"2026-10-18T12:00:00+00:00\"}}",
+            "header": "t=1792238400,v1=a470a11f090553406d7db1d5eac2c3e1a7414678715b1ed11fe4016d6f17b5b9",
+            "now": 1792238400,
+            "valid": true,
+            "reason": null,
+            "event": {
+                "id": "74438200973594804",
+                "type": "approval.requested"
+            }
+        },
+        {
+            "name": "approval.decided: signed now",
+            "payload": "{\"id\":\"74438200973594805\",\"type\":\"approval.decided\",\"created_at\":\"2026-10-17T12:00:00+00:00\",\"data\":{\"approval_id\":\"74438200973560021\",\"execution_id\":\"74438200973594702\",\"flow_id\":\"74438200973590002\",\"node_key\":\"approve_refund\",\"operation_code\":\"support.refund\",\"status\":\"approved\",\"reason\":null,\"decided_by\":null,\"decided_by_user_id\":\"74438200973550003\",\"decided_at\":\"2026-10-17T12:30:00+00:00\"}}",
+            "header": "t=1792238400,v1=4b8e9d39c17728d97f66a17cfb067456370545d978d0a7f93962ed5adeef666b",
+            "now": 1792238400,
+            "valid": true,
+            "reason": null,
+            "event": {
+                "id": "74438200973594805",
+                "type": "approval.decided"
+            }
+        },
+        {
+            "name": "flow.published, an event without a typed class: signed now",
+            "payload": "{\"id\":\"74438200973594806\",\"type\":\"flow.published\",\"created_at\":\"2026-10-17T12:00:00+00:00\",\"data\":{\"flow_id\":\"74438200973590001\",\"version\":7}}",
+            "header": "t=1792238400,v1=2e5d9ccc38d819a26aa66287c8d85b5d903a660c95c2d6bae08980297e1f488a",
+            "now": 1792238400,
+            "valid": true,
+            "reason": null,
+            "event": {
+                "id": "74438200973594806",
+                "type": "flow.published"
+            }
+        },
+        {
+            "name": "invoice.paid, a type the SDK does not know: signed now",
+            "payload": "{\"id\":\"74438200973594807\",\"type\":\"invoice.paid\",\"created_at\":\"2026-10-17T12:00:00+00:00\",\"data\":{\"invoice\":\"INV-7781\"}}",
+            "header": "t=1792238400,v1=6eef8da883273cb83a341412251f391e448dd31f3bc1a1ce4fe955033e99c1cd",
+            "now": 1792238400,
+            "valid": true,
+            "reason": null,
+            "event": {
+                "id": "74438200973594807",
+                "type": "invoice.paid"
+            }
+        },
+        {
+            "name": "now is the time of the signature plus the tolerance",
+            "payload": "{\"id\":\"74438200973594801\",\"type\":\"execution.finished\",\"created_at\":\"2026-10-17T12:00:00+00:00\",\"data\":{\"execution_id\":\"74438200973594700\",\"flow_id\":\"74438200973590001\",\"operation\":\"support.reply\",\"status\":\"completed\",\"error_code\":null}}",
+            "header": "t=1792238400,v1=d90c1b78be2a0b86c06059a6dcbf096bd9b3d72b81282c597b744653fad473a9",
+            "now": 1792238700,
+            "valid": true,
+            "reason": null,
+            "event": {
+                "id": "74438200973594801",
+                "type": "execution.finished"
+            }
+        },
+        {
+            "name": "now is the time of the signature minus the tolerance",
+            "payload": "{\"id\":\"74438200973594801\",\"type\":\"execution.finished\",\"created_at\":\"2026-10-17T12:00:00+00:00\",\"data\":{\"execution_id\":\"74438200973594700\",\"flow_id\":\"74438200973590001\",\"operation\":\"support.reply\",\"status\":\"completed\",\"error_code\":null}}",
+            "header": "t=1792238400,v1=d90c1b78be2a0b86c06059a6dcbf096bd9b3d72b81282c597b744653fad473a9",
+            "now": 1792238100,
+            "valid": true,
+            "reason": null,
+            "event": {
+                "id": "74438200973594801",
+                "type": "execution.finished"
+            }
+        },
+        {
+            "name": "now is one second past the tolerance",
+            "payload": "{\"id\":\"74438200973594801\",\"type\":\"execution.finished\",\"created_at\":\"2026-10-17T12:00:00+00:00\",\"data\":{\"execution_id\":\"74438200973594700\",\"flow_id\":\"74438200973590001\",\"operation\":\"support.reply\",\"status\":\"completed\",\"error_code\":null}}",
+            "header": "t=1792238400,v1=d90c1b78be2a0b86c06059a6dcbf096bd9b3d72b81282c597b744653fad473a9",
+            "now": 1792238701,
+            "valid": false,
+            "reason": "outside_tolerance",
+            "event": null
+        },
+        {
+            "name": "now is one second before the tolerance",
+            "payload": "{\"id\":\"74438200973594801\",\"type\":\"execution.finished\",\"created_at\":\"2026-10-17T12:00:00+00:00\",\"data\":{\"execution_id\":\"74438200973594700\",\"flow_id\":\"74438200973590001\",\"operation\":\"support.reply\",\"status\":\"completed\",\"error_code\":null}}",
+            "header": "t=1792238400,v1=d90c1b78be2a0b86c06059a6dcbf096bd9b3d72b81282c597b744653fad473a9",
+            "now": 1792238099,
+            "valid": false,
+            "reason": "outside_tolerance",
+            "event": null
+        },
+        {
+            "name": "a signature an hour old",
+            "payload": "{\"id\":\"74438200973594801\",\"type\":\"execution.finished\",\"created_at\":\"2026-10-17T12:00:00+00:00\",\"data\":{\"execution_id\":\"74438200973594700\",\"flow_id\":\"74438200973590001\",\"operation\":\"support.reply\",\"status\":\"completed\",\"error_code\":null}}",
+            "header": "t=1792238400,v1=d90c1b78be2a0b86c06059a6dcbf096bd9b3d72b81282c597b744653fad473a9",
+            "now": 1792242000,
+            "valid": false,
+            "reason": "outside_tolerance",
+            "event": null
+        },
+        {
+            "name": "signed with another secret",
+            "payload": "{\"id\":\"74438200973594801\",\"type\":\"execution.finished\",\"created_at\":\"2026-10-17T12:00:00+00:00\",\"data\":{\"execution_id\":\"74438200973594700\",\"flow_id\":\"74438200973590001\",\"operation\":\"support.reply\",\"status\":\"completed\",\"error_code\":null}}",
+            "header": "t=1792238400,v1=fb42d05c3b1bdfb5eb39a09d8b50e14ccdd78d4e6db878062c5125f981028d87",
+            "now": 1792238400,
+            "valid": false,
+            "reason": "no_matching_signature",
+            "event": null
+        },
+        {
+            "name": "the body changed by one byte",
+            "payload": "{\"id\":\"74438200973594801\",\"type\":\"execution.finished\",\"created_at\":\"2026-10-17T12:00:00+00:00\",\"data\":{\"execution_id\":\"74438200973594706\",\"flow_id\":\"74438200973590001\",\"operation\":\"support.reply\",\"status\":\"completed\",\"error_code\":null}}",
+            "header": "t=1792238400,v1=d90c1b78be2a0b86c06059a6dcbf096bd9b3d72b81282c597b744653fad473a9",
+            "now": 1792238400,
+            "valid": false,
+            "reason": "no_matching_signature",
+            "event": null
+        },
+        {
+            "name": "the body with a trailing newline",
+            "payload": "{\"id\":\"74438200973594801\",\"type\":\"execution.finished\",\"created_at\":\"2026-10-17T12:00:00+00:00\",\"data\":{\"execution_id\":\"74438200973594700\",\"flow_id\":\"74438200973590001\",\"operation\":\"support.reply\",\"status\":\"completed\",\"error_code\":null}}\n",
+            "header": "t=1792238400,v1=d90c1b78be2a0b86c06059a6dcbf096bd9b3d72b81282c597b744653fad473a9",
+            "now": 1792238400,
+            "valid": false,
+            "reason": "no_matching_signature",
+            "event": null
+        },
+        {
+            "name": "the body decoded and encoded again",
+            "payload": "{\"id\":\"74438200973594804\",\"type\":\"approval.requested\",\"created_at\":\"2026-10-17T12:00:00+00:00\",\"data\":{\"approval_id\":\"74438200973560021\",\"execution_id\":\"74438200973594702\",\"flow_id\":\"74438200973590002\",\"node_key\":\"approve_refund\",\"operation_code\":\"support.refund\",\"note\":\"\\u041f\\u043e\\u0432\\u0435\\u0440\\u043d\\u0435\\u043d\\u043d\\u044f \\u043f\\u043e\\u043d\\u0430\\u0434 \\u043b\\u0456\\u043c\\u0456\\u0442 \\u2014 \\u043f\\u0435\\u0440\\u0435\\u0432\\u0456\\u0440\\u0442\\u0435 \\u2713\",\"expires_at\":\"2026-10-18T12:00:00+00:00\"}}",
+            "header": "t=1792238400,v1=a470a11f090553406d7db1d5eac2c3e1a7414678715b1ed11fe4016d6f17b5b9",
+            "now": 1792238400,
+            "valid": false,
+            "reason": "no_matching_signature",
+            "event": null
+        },
+        {
+            "name": "two v1 values, the second one matches (a rotated secret)",
+            "payload": "{\"id\":\"74438200973594801\",\"type\":\"execution.finished\",\"created_at\":\"2026-10-17T12:00:00+00:00\",\"data\":{\"execution_id\":\"74438200973594700\",\"flow_id\":\"74438200973590001\",\"operation\":\"support.reply\",\"status\":\"completed\",\"error_code\":null}}",
+            "header": "t=1792238400,v1=fb42d05c3b1bdfb5eb39a09d8b50e14ccdd78d4e6db878062c5125f981028d87,v1=d90c1b78be2a0b86c06059a6dcbf096bd9b3d72b81282c597b744653fad473a9",
+            "now": 1792238400,
+            "valid": true,
+            "reason": null,
+            "event": {
+                "id": "74438200973594801",
+                "type": "execution.finished"
+            }
+        },
+        {
+            "name": "two v1 values, the first one matches",
+            "payload": "{\"id\":\"74438200973594801\",\"type\":\"execution.finished\",\"created_at\":\"2026-10-17T12:00:00+00:00\",\"data\":{\"execution_id\":\"74438200973594700\",\"flow_id\":\"74438200973590001\",\"operation\":\"support.reply\",\"status\":\"completed\",\"error_code\":null}}",
+            "header": "t=1792238400,v1=d90c1b78be2a0b86c06059a6dcbf096bd9b3d72b81282c597b744653fad473a9,v1=fb42d05c3b1bdfb5eb39a09d8b50e14ccdd78d4e6db878062c5125f981028d87",
+            "now": 1792238400,
+            "valid": true,
+            "reason": null,
+            "event": {
+                "id": "74438200973594801",
+                "type": "execution.finished"
+            }
+        },
+        {
+            "name": "two v1 values, neither matches",
+            "payload": "{\"id\":\"74438200973594801\",\"type\":\"execution.finished\",\"created_at\":\"2026-10-17T12:00:00+00:00\",\"data\":{\"execution_id\":\"74438200973594700\",\"flow_id\":\"74438200973590001\",\"operation\":\"support.reply\",\"status\":\"completed\",\"error_code\":null}}",
+            "header": "t=1792238400,v1=fb42d05c3b1bdfb5eb39a09d8b50e14ccdd78d4e6db878062c5125f981028d87,v1=9a374daf356447b795c28218b27d3b9db690fbcd6a95060c68b0a2eb87b1c09d",
+            "now": 1792238400,
+            "valid": false,
+            "reason": "no_matching_signature",
+            "event": null
+        },
+        {
+            "name": "v1 before t, with spaces around the pairs",
+            "payload": "{\"id\":\"74438200973594801\",\"type\":\"execution.finished\",\"created_at\":\"2026-10-17T12:00:00+00:00\",\"data\":{\"execution_id\":\"74438200973594700\",\"flow_id\":\"74438200973590001\",\"operation\":\"support.reply\",\"status\":\"completed\",\"error_code\":null}}",
+            "header": " v1=d90c1b78be2a0b86c06059a6dcbf096bd9b3d72b81282c597b744653fad473a9 , t=1792238400 ",
+            "now": 1792238400,
+            "valid": true,
+            "reason": null,
+            "event": {
+                "id": "74438200973594801",
+                "type": "execution.finished"
+            }
+        },
+        {
+            "name": "an unknown scheme beside v1",
+            "payload": "{\"id\":\"74438200973594801\",\"type\":\"execution.finished\",\"created_at\":\"2026-10-17T12:00:00+00:00\",\"data\":{\"execution_id\":\"74438200973594700\",\"flow_id\":\"74438200973590001\",\"operation\":\"support.reply\",\"status\":\"completed\",\"error_code\":null}}",
+            "header": "t=1792238400,v0=deadbeef,v1=d90c1b78be2a0b86c06059a6dcbf096bd9b3d72b81282c597b744653fad473a9",
+            "now": 1792238400,
+            "valid": true,
+            "reason": null,
+            "event": {
+                "id": "74438200973594801",
+                "type": "execution.finished"
+            }
+        },
+        {
+            "name": "v1 in upper-case hex",
+            "payload": "{\"id\":\"74438200973594801\",\"type\":\"execution.finished\",\"created_at\":\"2026-10-17T12:00:00+00:00\",\"data\":{\"execution_id\":\"74438200973594700\",\"flow_id\":\"74438200973590001\",\"operation\":\"support.reply\",\"status\":\"completed\",\"error_code\":null}}",
+            "header": "t=1792238400,v1=D90C1B78BE2A0B86C06059A6DCBF096BD9B3D72B81282C597B744653FAD473A9",
+            "now": 1792238400,
+            "valid": false,
+            "reason": "no_matching_signature",
+            "event": null
+        },
+        {
+            "name": "v1 cut short",
+            "payload": "{\"id\":\"74438200973594801\",\"type\":\"execution.finished\",\"created_at\":\"2026-10-17T12:00:00+00:00\",\"data\":{\"execution_id\":\"74438200973594700\",\"flow_id\":\"74438200973590001\",\"operation\":\"support.reply\",\"status\":\"completed\",\"error_code\":null}}",
+            "header": "t=1792238400,v1=d90c1b78be2a0b86c06059a6dcbf096bd9b3d72b81282c597b744653fad473a",
+            "now": 1792238400,
+            "valid": false,
+            "reason": "no_matching_signature",
+            "event": null
+        },
+        {
+            "name": "an empty v1",
+            "payload": "{\"id\":\"74438200973594801\",\"type\":\"execution.finished\",\"created_at\":\"2026-10-17T12:00:00+00:00\",\"data\":{\"execution_id\":\"74438200973594700\",\"flow_id\":\"74438200973590001\",\"operation\":\"support.reply\",\"status\":\"completed\",\"error_code\":null}}",
+            "header": "t=1792238400,v1=",
+            "now": 1792238400,
+            "valid": false,
+            "reason": "no_matching_signature",
+            "event": null
+        },
+        {
+            "name": "no header",
+            "payload": "{\"id\":\"74438200973594801\",\"type\":\"execution.finished\",\"created_at\":\"2026-10-17T12:00:00+00:00\",\"data\":{\"execution_id\":\"74438200973594700\",\"flow_id\":\"74438200973590001\",\"operation\":\"support.reply\",\"status\":\"completed\",\"error_code\":null}}",
+            "header": null,
+            "now": 1792238400,
+            "valid": false,
+            "reason": "missing_header",
+            "event": null
+        },
+        {
+            "name": "an empty header",
+            "payload": "{\"id\":\"74438200973594801\",\"type\":\"execution.finished\",\"created_at\":\"2026-10-17T12:00:00+00:00\",\"data\":{\"execution_id\":\"74438200973594700\",\"flow_id\":\"74438200973590001\",\"operation\":\"support.reply\",\"status\":\"completed\",\"error_code\":null}}",
+            "header": "",
+            "now": 1792238400,
+            "valid": false,
+            "reason": "missing_header",
+            "event": null
+        },
+        {
+            "name": "a header of spaces",
+            "payload": "{\"id\":\"74438200973594801\",\"type\":\"execution.finished\",\"created_at\":\"2026-10-17T12:00:00+00:00\",\"data\":{\"execution_id\":\"74438200973594700\",\"flow_id\":\"74438200973590001\",\"operation\":\"support.reply\",\"status\":\"completed\",\"error_code\":null}}",
+            "header": "   ",
+            "now": 1792238400,
+            "valid": false,
+            "reason": "missing_header",
+            "event": null
+        },
+        {
+            "name": "no t",
+            "payload": "{\"id\":\"74438200973594801\",\"type\":\"execution.finished\",\"created_at\":\"2026-10-17T12:00:00+00:00\",\"data\":{\"execution_id\":\"74438200973594700\",\"flow_id\":\"74438200973590001\",\"operation\":\"support.reply\",\"status\":\"completed\",\"error_code\":null}}",
+            "header": "v1=d90c1b78be2a0b86c06059a6dcbf096bd9b3d72b81282c597b744653fad473a9",
+            "now": 1792238400,
+            "valid": false,
+            "reason": "malformed_header",
+            "event": null
+        },
+        {
+            "name": "no v1",
+            "payload": "{\"id\":\"74438200973594801\",\"type\":\"execution.finished\",\"created_at\":\"2026-10-17T12:00:00+00:00\",\"data\":{\"execution_id\":\"74438200973594700\",\"flow_id\":\"74438200973590001\",\"operation\":\"support.reply\",\"status\":\"completed\",\"error_code\":null}}",
+            "header": "t=1792238400",
+            "now": 1792238400,
+            "valid": false,
+            "reason": "malformed_header",
+            "event": null
+        },
+        {
+            "name": "only another scheme",
+            "payload": "{\"id\":\"74438200973594801\",\"type\":\"execution.finished\",\"created_at\":\"2026-10-17T12:00:00+00:00\",\"data\":{\"execution_id\":\"74438200973594700\",\"flow_id\":\"74438200973590001\",\"operation\":\"support.reply\",\"status\":\"completed\",\"error_code\":null}}",
+            "header": "t=1792238400,v0=d90c1b78be2a0b86c06059a6dcbf096bd9b3d72b81282c597b744653fad473a9",
+            "now": 1792238400,
+            "valid": false,
+            "reason": "malformed_header",
+            "event": null
+        },
+        {
+            "name": "t is not a number of seconds",
+            "payload": "{\"id\":\"74438200973594801\",\"type\":\"execution.finished\",\"created_at\":\"2026-10-17T12:00:00+00:00\",\"data\":{\"execution_id\":\"74438200973594700\",\"flow_id\":\"74438200973590001\",\"operation\":\"support.reply\",\"status\":\"completed\",\"error_code\":null}}",
+            "header": "t=1792238400a,v1=d90c1b78be2a0b86c06059a6dcbf096bd9b3d72b81282c597b744653fad473a9",
+            "now": 1792238400,
+            "valid": false,
+            "reason": "malformed_header",
+            "event": null
+        },
+        {
+            "name": "t is negative",
+            "payload": "{\"id\":\"74438200973594801\",\"type\":\"execution.finished\",\"created_at\":\"2026-10-17T12:00:00+00:00\",\"data\":{\"execution_id\":\"74438200973594700\",\"flow_id\":\"74438200973590001\",\"operation\":\"support.reply\",\"status\":\"completed\",\"error_code\":null}}",
+            "header": "t=-1792238400,v1=d90c1b78be2a0b86c06059a6dcbf096bd9b3d72b81282c597b744653fad473a9",
+            "now": 1792238400,
+            "valid": false,
+            "reason": "malformed_header",
+            "event": null
+        },
+        {
+            "name": "t is empty",
+            "payload": "{\"id\":\"74438200973594801\",\"type\":\"execution.finished\",\"created_at\":\"2026-10-17T12:00:00+00:00\",\"data\":{\"execution_id\":\"74438200973594700\",\"flow_id\":\"74438200973590001\",\"operation\":\"support.reply\",\"status\":\"completed\",\"error_code\":null}}",
+            "header": "t=,v1=d90c1b78be2a0b86c06059a6dcbf096bd9b3d72b81282c597b744653fad473a9",
+            "now": 1792238400,
+            "valid": false,
+            "reason": "malformed_header",
+            "event": null
+        },
+        {
+            "name": "two t values",
+            "payload": "{\"id\":\"74438200973594801\",\"type\":\"execution.finished\",\"created_at\":\"2026-10-17T12:00:00+00:00\",\"data\":{\"execution_id\":\"74438200973594700\",\"flow_id\":\"74438200973590001\",\"operation\":\"support.reply\",\"status\":\"completed\",\"error_code\":null}}",
+            "header": "t=1792238400,t=1792238401,v1=d90c1b78be2a0b86c06059a6dcbf096bd9b3d72b81282c597b744653fad473a9",
+            "now": 1792238400,
+            "valid": false,
+            "reason": "malformed_header",
+            "event": null
+        },
+        {
+            "name": "not pairs at all",
+            "payload": "{\"id\":\"74438200973594801\",\"type\":\"execution.finished\",\"created_at\":\"2026-10-17T12:00:00+00:00\",\"data\":{\"execution_id\":\"74438200973594700\",\"flow_id\":\"74438200973590001\",\"operation\":\"support.reply\",\"status\":\"completed\",\"error_code\":null}}",
+            "header": "garbage",
+            "now": 1792238400,
+            "valid": false,
+            "reason": "malformed_header",
+            "event": null
+        },
+        {
+            "name": "the body is not JSON: signed now",
+            "payload": "not json",
+            "header": "t=1792238400,v1=6ff5b6fb86e51e136773487353eaa6c6652d0bff3f73af228313412fe369d3ec",
+            "now": 1792238400,
+            "valid": true,
+            "reason": null,
+            "event": null
+        },
+        {
+            "name": "the body is a JSON list: signed now",
+            "payload": "[]",
+            "header": "t=1792238400,v1=4ec27830ee36b3363e7c50011ddc236fe8ae7420f8a00b8be6331032459672f3",
+            "now": 1792238400,
+            "valid": true,
+            "reason": null,
+            "event": null
+        },
+        {
+            "name": "the body has no data: signed now",
+            "payload": "{\"id\":\"74438200973594808\",\"type\":\"execution.finished\",\"created_at\":\"2026-10-17T12:00:00+00:00\"}",
+            "header": "t=1792238400,v1=bf4e525ffee43e3f7ff4555d3fb0ae0cdb3bfe3ac5bbe22fa2a77dfdcfbc81f3",
+            "now": 1792238400,
+            "valid": true,
+            "reason": null,
+            "event": null
+        },
+        {
+            "name": "the body has no type: signed now",
+            "payload": "{\"id\":\"74438200973594809\",\"created_at\":\"2026-10-17T12:00:00+00:00\",\"data\":[]}",
+            "header": "t=1792238400,v1=16595fd1e405c006cb270f8d63768dc73d477b00fc51a26e985ebe692573f796",
+            "now": 1792238400,
+            "valid": true,
+            "reason": null,
+            "event": null
+        }
+    ]
+}

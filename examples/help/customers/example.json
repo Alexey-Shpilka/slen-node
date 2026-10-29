@@ -1,0 +1,166 @@
+{
+  "id": "customers",
+  "status": "ready",
+  "summary": "End customers and their credits: create a customer, top the account up, read it, charge it for a service of your own, read the statement — and the run of a customer whose account cannot pay for it, refused with insufficient_credits; then block the first one.",
+  "languages": ["node", "php"],
+  "regions": ["client", "create", "top-up", "read", "charge", "statement", "refused", "block"],
+  "responses": [
+    {
+      "status": 201,
+      "body": {
+        "data": {
+          "customer_id": "74438200973595100",
+          "external_user_id": "user_8421",
+          "status": "active",
+          "blocked_at": null,
+          "block_reason": null,
+          "accounts": [],
+          "created_at": "2026-10-17T09:00:00+00:00",
+          "updated_at": "2026-10-17T09:00:00+00:00"
+        }
+      }
+    },
+    {
+      "status": 200,
+      "body": {
+        "data": {
+          "customer_account_id": "74438200973595100",
+          "customer_id": "74438200973595100",
+          "project_id": "74438200973590001",
+          "external_user_id": "user_8421",
+          "credit_type": "default",
+          "balance": "100.0000",
+          "reserved": "0.0000",
+          "available": "100.0000",
+          "allow_negative": false,
+          "low_balance_threshold": "10.0000",
+          "created_at": "2026-10-17T09:05:00+00:00",
+          "updated_at": "2026-10-17T09:05:00+00:00"
+        }
+      }
+    },
+    {
+      "status": 200,
+      "body": {
+        "data": {
+          "customer_id": "74438200973595100",
+          "external_user_id": "user_8421",
+          "status": "active",
+          "blocked_at": null,
+          "block_reason": null,
+          "accounts": [
+            {
+              "customer_account_id": "74438200973595100",
+              "customer_id": "74438200973595100",
+              "project_id": "74438200973590001",
+              "external_user_id": "user_8421",
+              "credit_type": "default",
+              "balance": "100.0000",
+              "reserved": "0.0000",
+              "available": "100.0000",
+              "allow_negative": false,
+              "low_balance_threshold": "10.0000",
+              "created_at": "2026-10-17T09:05:00+00:00",
+              "updated_at": "2026-10-17T09:05:00+00:00"
+            }
+          ],
+          "created_at": "2026-10-17T09:00:00+00:00",
+          "updated_at": "2026-10-17T09:05:00+00:00"
+        }
+      }
+    },
+    {
+      "status": 200,
+      "body": {
+        "data": {
+          "customer_account_id": "74438200973595100",
+          "customer_id": "74438200973595100",
+          "project_id": "74438200973590001",
+          "external_user_id": "user_8421",
+          "credit_type": "default",
+          "balance": "95.0000",
+          "reserved": "0.0000",
+          "available": "95.0000",
+          "allow_negative": false,
+          "low_balance_threshold": "10.0000",
+          "created_at": "2026-10-17T09:05:00+00:00",
+          "updated_at": "2026-10-17T09:10:00+00:00"
+        }
+      }
+    },
+    {
+      "status": 200,
+      "body": {
+        "data": [
+          {
+            "entry_id": "74438200973595202",
+            "customer_account_id": "74438200973595100",
+            "external_user_id": "user_8421",
+            "credit_type": "default",
+            "entry_type": "charge",
+            "credits": "-5.0000",
+            "balance_after": "95.0000",
+            "available_after": "95.0000",
+            "reservation_id": null,
+            "note": "PDF export",
+            "created_at": "2026-10-17T09:10:00+00:00"
+          },
+          {
+            "entry_id": "74438200973595201",
+            "customer_account_id": "74438200973595100",
+            "external_user_id": "user_8421",
+            "credit_type": "default",
+            "entry_type": "topup",
+            "credits": "100.0000",
+            "balance_after": "100.0000",
+            "available_after": "100.0000",
+            "reservation_id": null,
+            "note": "Invoice 7781",
+            "created_at": "2026-10-17T09:05:00+00:00"
+          }
+        ],
+        "meta": { "limit": 2, "next_cursor": "74438200973595201" }
+      }
+    },
+    {
+      "status": 402,
+      "body": {
+        "error": {
+          "code": "insufficient_credits",
+          "message": "Customer account 74438200973595300 cannot cover 2 default credits",
+          "request_id": "9c2d7e41-6b0a-4f3e-8d15-2a7f9e0c4b63"
+        }
+      }
+    },
+    {
+      "status": 200,
+      "body": {
+        "data": {
+          "customer_id": "74438200973595100",
+          "external_user_id": "user_8421",
+          "status": "blocked",
+          "blocked_at": "2026-10-17T09:20:00+00:00",
+          "block_reason": "chargeback",
+          "accounts": [
+            {
+              "customer_account_id": "74438200973595100",
+              "customer_id": "74438200973595100",
+              "project_id": "74438200973590001",
+              "external_user_id": "user_8421",
+              "credit_type": "default",
+              "balance": "95.0000",
+              "reserved": "0.0000",
+              "available": "95.0000",
+              "allow_negative": false,
+              "low_balance_threshold": "10.0000",
+              "created_at": "2026-10-17T09:05:00+00:00",
+              "updated_at": "2026-10-17T09:10:00+00:00"
+            }
+          ],
+          "created_at": "2026-10-17T09:00:00+00:00",
+          "updated_at": "2026-10-17T09:20:00+00:00"
+        }
+      }
+    }
+  ]
+}

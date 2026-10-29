@@ -1,0 +1,19 @@
+{
+  "calls": [
+    {
+      "method": "POST",
+      "path": "/v1/operations/execute",
+      "headers": { "Authorization": "Bearer key-for-tests", "Idempotency-Key": "order-42:email" },
+      "body": {
+        "operation": "generate_email",
+        "input": { "messages": [{ "role": "user", "content": "Write a short follow-up email." }] }
+      }
+    }
+  ],
+  "prints": [
+    "completed",
+    "POST https://api.slen.ai/api/v1/operations/execute",
+    "order-42:email",
+    "generate_email"
+  ]
+}

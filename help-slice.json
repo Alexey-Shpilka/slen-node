@@ -1,0 +1,5159 @@
+{
+  "schema": 2,
+  "language": "node",
+  "package": {
+    "name": "@slen/sdk",
+    "version": "0.3.0",
+    "manifest": "package.json",
+    "runtime": {
+      "name": "node",
+      "constraint": ">=20.3"
+    },
+    "dependencies": [
+      {
+        "name": "@opentelemetry/api",
+        "constraint": ">=1.7.0",
+        "optional": true
+      }
+    ]
+  },
+  "client": {
+    "class": "Slen",
+    "options": "SlenOptions"
+  },
+  "options": [
+    {
+      "name": "apiKey",
+      "type": "string",
+      "required": false,
+      "default": null,
+      "default_known": true,
+      "env": [
+        "SLEN_API_KEY"
+      ],
+      "description": "The project's API key. Falls back to `SLEN_API_KEY`."
+    },
+    {
+      "name": "baseUrl",
+      "type": "string",
+      "required": false,
+      "default": {
+        "code": "'https://api.slen.ai'",
+        "value": "https://api.slen.ai"
+      },
+      "default_known": true,
+      "env": [],
+      "description": "Host root without `/api`, for tests and a local stack. Default: the hosted API."
+    },
+    {
+      "name": "timeoutMs",
+      "type": "number",
+      "required": false,
+      "default": {
+        "code": "65_000",
+        "value": 65000
+      },
+      "default_known": true,
+      "env": [],
+      "description": "How long one attempt may take, in ms. Default 65 000."
+    },
+    {
+      "name": "retries",
+      "type": "number",
+      "required": false,
+      "default": {
+        "code": "2",
+        "value": 2
+      },
+      "default_known": true,
+      "env": [],
+      "description": "Attempts after the first when there is no answer, a 429 or a 503. Default 2."
+    },
+    {
+      "name": "logger",
+      "type": "SlenLogger",
+      "required": false,
+      "default": {
+        "code": "NOOP_LOGGER"
+      },
+      "default_known": true,
+      "env": [],
+      "description": "Where the journal goes: `console` or any logger with `debug`, `info`, `warn`, `error`. Default: nowhere."
+    },
+    {
+      "name": "spanRecorder",
+      "type": "SpanRecorder",
+      "required": false,
+      "default": null,
+      "default_known": false,
+      "env": [],
+      "description": "Where spans go. Default: nowhere."
+    },
+    {
+      "name": "otlp",
+      "type": "OtlpExporterOptions",
+      "required": false,
+      "default": null,
+      "default_known": false,
+      "env": [],
+      "description": "Sends spans to an OTLP/HTTP collector, next to `spanRecorder`."
+    },
+    {
+      "name": "fetch",
+      "type": "typeof fetch",
+      "required": false,
+      "default": {
+        "code": "globalThis.fetch"
+      },
+      "default_known": true,
+      "env": [],
+      "description": "The `fetch` requests are sent with. Default: the runtime's own."
+    },
+    {
+      "name": "headers",
+      "type": "Record<string, string>",
+      "required": false,
+      "default": {
+        "code": "{}",
+        "value": {}
+      },
+      "default_known": true,
+      "env": [],
+      "description": "Extra headers on every request. The SDK's own headers win over them."
+    },
+    {
+      "name": "webhookSecret",
+      "type": "string",
+      "required": false,
+      "default": {
+        "code": "null",
+        "value": null
+      },
+      "default_known": true,
+      "env": [],
+      "description": "The signing secret of your webhook endpoint, for verifying `Slen-Signature`."
+    },
+    {
+      "name": "webhookToleranceSeconds",
+      "type": "number",
+      "required": false,
+      "default": {
+        "code": "300",
+        "value": 300
+      },
+      "default_known": true,
+      "env": [],
+      "description": "How old a webhook signature may be, in seconds. Default 300."
+    }
+  ],
+  "config_file": null,
+  "calls": [
+    {
+      "name": "customers.adjust",
+      "symbol": "CustomersModule",
+      "member": "adjust",
+      "deprecated": false,
+      "internal": false,
+      "signature": "adjust(externalUserId: string, credits: string, options?: MovementOptions): Promise<CustomerAccount>",
+      "operation": "POST /v1/customers/{externalUserId}/adjust"
+    },
+    {
+      "name": "customers.block",
+      "symbol": "CustomersModule",
+      "member": "block",
+      "deprecated": false,
+      "internal": false,
+      "signature": "block(externalUserId: string, options?: BlockOptions): Promise<Customer>",
+      "operation": "POST /v1/customers/{externalUserId}/block"
+    },
+    {
+      "name": "customers.charge",
+      "symbol": "CustomersModule",
+      "member": "charge",
+      "deprecated": false,
+      "internal": false,
+      "signature": "charge(externalUserId: string, credits: string, options?: MovementOptions): Promise<CustomerAccount>",
+      "operation": "POST /v1/customers/{externalUserId}/charge"
+    },
+    {
+      "name": "customers.create",
+      "symbol": "CustomersModule",
+      "member": "create",
+      "deprecated": false,
+      "internal": false,
+      "signature": "create(externalUserId: string, options?: RequestOptions): Promise<Customer>",
+      "operation": "PUT /v1/customers/{externalUserId}"
+    },
+    {
+      "name": "customers.delete",
+      "symbol": "CustomersModule",
+      "member": "delete",
+      "deprecated": false,
+      "internal": false,
+      "signature": "delete(externalUserId: string, options?: RequestOptions): Promise<void>",
+      "operation": "DELETE /v1/customers/{externalUserId}"
+    },
+    {
+      "name": "customers.entries",
+      "symbol": "CustomersModule",
+      "member": "entries",
+      "deprecated": false,
+      "internal": false,
+      "signature": "entries(externalUserId: string, options?: EntryListOptions): Promise<Page<CreditEntry>>",
+      "operation": "GET /v1/customers/{externalUserId}/entries"
+    },
+    {
+      "name": "customers.get",
+      "symbol": "CustomersModule",
+      "member": "get",
+      "deprecated": false,
+      "internal": false,
+      "signature": "get(externalUserId: string, options?: RequestOptions): Promise<Customer>",
+      "operation": "GET /v1/customers/{externalUserId}"
+    },
+    {
+      "name": "customers.list",
+      "symbol": "CustomersModule",
+      "member": "list",
+      "deprecated": false,
+      "internal": false,
+      "signature": "list(options?: CustomerListOptions): Promise<Page<Customer>>",
+      "operation": "GET /v1/customers"
+    },
+    {
+      "name": "customers.prices",
+      "symbol": "CustomersModule",
+      "member": "prices",
+      "deprecated": false,
+      "internal": false,
+      "signature": "prices(options?: PriceListOptions): Promise<CreditPrice[]>",
+      "operation": "GET /v1/credit-prices"
+    },
+    {
+      "name": "customers.topUp",
+      "symbol": "CustomersModule",
+      "member": "topUp",
+      "deprecated": false,
+      "internal": false,
+      "signature": "topUp(externalUserId: string, credits: string, options?: MovementOptions): Promise<CustomerAccount>",
+      "operation": "POST /v1/customers/{externalUserId}/topup"
+    },
+    {
+      "name": "customers.unblock",
+      "symbol": "CustomersModule",
+      "member": "unblock",
+      "deprecated": false,
+      "internal": false,
+      "signature": "unblock(externalUserId: string, options?: RequestOptions): Promise<Customer>",
+      "operation": "POST /v1/customers/{externalUserId}/unblock"
+    },
+    {
+      "name": "customers.updateAccount",
+      "symbol": "CustomersModule",
+      "member": "updateAccount",
+      "deprecated": false,
+      "internal": false,
+      "signature": "updateAccount(externalUserId: string, creditType: string, options?: AccountOptions): Promise<CustomerAccount>",
+      "operation": "PUT /v1/customers/{externalUserId}/accounts/{creditType}"
+    },
+    {
+      "name": "executions.get",
+      "symbol": "ExecutionsModule",
+      "member": "get",
+      "deprecated": false,
+      "internal": false,
+      "signature": "get(executionId: string, options?: RequestOptions): Promise<ExecutionStatusView>",
+      "operation": "GET /v1/executions/{id}/status"
+    },
+    {
+      "name": "executions.trace",
+      "symbol": "ExecutionsModule",
+      "member": "trace",
+      "deprecated": false,
+      "internal": false,
+      "signature": "trace(executionId: string, options?: RequestOptions): Promise<ExecutionTrace>",
+      "operation": "GET /v1/executions/{id}"
+    },
+    {
+      "name": "executions.wait",
+      "symbol": "ExecutionsModule",
+      "member": "wait",
+      "deprecated": false,
+      "internal": false,
+      "signature": "wait(executionId: string, options?: WaitOptions): Promise<ExecutionStatusView>",
+      "operation": "GET /v1/executions/{id}/status"
+    },
+    {
+      "name": "flush",
+      "symbol": "Slen",
+      "member": "flush",
+      "deprecated": false,
+      "internal": false,
+      "signature": "flush(): Promise<void>",
+      "operation": null
+    },
+    {
+      "name": "health",
+      "symbol": "Slen",
+      "member": "health",
+      "deprecated": false,
+      "internal": false,
+      "signature": "health(options?: RequestOptions): Promise<Health>",
+      "operation": "GET /health"
+    },
+    {
+      "name": "operations.execute",
+      "symbol": "OperationsModule",
+      "member": "execute",
+      "deprecated": false,
+      "internal": false,
+      "signature": "execute(operation: string, input: Record<string, unknown>, options?: ExecuteOptions): Promise<ExecutionResult>",
+      "operation": "POST /v1/operations/execute"
+    },
+    {
+      "name": "operations.executeAsync",
+      "symbol": "OperationsModule",
+      "member": "executeAsync",
+      "deprecated": false,
+      "internal": false,
+      "signature": "executeAsync(operation: string, input: Record<string, unknown>, options?: ExecuteOptions): Promise<ExecutionResult>",
+      "operation": "POST /v1/operations/execute"
+    },
+    {
+      "name": "webhooks.constructEvent",
+      "symbol": "WebhooksModule",
+      "member": "constructEvent",
+      "deprecated": false,
+      "internal": false,
+      "signature": "constructEvent(payload: WebhookPayload, signatureHeader: string | null | undefined, options?: VerifyOptions): Promise<WebhookEvent>",
+      "operation": null
+    },
+    {
+      "name": "webhooks.verify",
+      "symbol": "WebhooksModule",
+      "member": "verify",
+      "deprecated": false,
+      "internal": false,
+      "signature": "verify(payload: WebhookPayload, signatureHeader: string | null | undefined, options?: VerifyOptions): Promise<boolean>",
+      "operation": null
+    }
+  ],
+  "symbols": [
+    {
+      "name": "AccountOptions",
+      "kind": "interface",
+      "source": "src/modules/customers/customers.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [
+        "RequestOptions"
+      ],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "allowNegative",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "allowNegative?: boolean"
+        },
+        {
+          "name": "lowBalanceThreshold",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "lowBalanceThreshold?: string"
+        }
+      ]
+    },
+    {
+      "name": "ApprovalDecidedEvent",
+      "kind": "type",
+      "source": "src/modules/webhooks/types.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "ApprovalDecidedEvent = WebhookEventEnvelope<'approval.decided', ApprovalDecidedEventData>",
+      "members": []
+    },
+    {
+      "name": "ApprovalDecidedEventData",
+      "kind": "interface",
+      "source": "src/modules/webhooks/types.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "approval_id",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "approval_id: Id"
+        },
+        {
+          "name": "execution_id",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "execution_id: Id"
+        },
+        {
+          "name": "flow_id",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "flow_id: Id"
+        },
+        {
+          "name": "node_key",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "node_key: string"
+        },
+        {
+          "name": "operation_code",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "operation_code: string"
+        },
+        {
+          "name": "status",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "status: 'approved' | 'rejected' | 'expired'"
+        },
+        {
+          "name": "reason",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "reason: string | null"
+        },
+        {
+          "name": "decided_by",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "decided_by: string | null"
+        },
+        {
+          "name": "decided_by_user_id",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "decided_by_user_id: string | null"
+        },
+        {
+          "name": "decided_at",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "decided_at: string | null"
+        }
+      ]
+    },
+    {
+      "name": "ApprovalRequestedEvent",
+      "kind": "type",
+      "source": "src/modules/webhooks/types.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "ApprovalRequestedEvent = WebhookEventEnvelope<'approval.requested', ApprovalRequestedEventData>",
+      "members": []
+    },
+    {
+      "name": "ApprovalRequestedEventData",
+      "kind": "interface",
+      "source": "src/modules/webhooks/types.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "approval_id",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "approval_id: Id"
+        },
+        {
+          "name": "execution_id",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "execution_id: Id"
+        },
+        {
+          "name": "flow_id",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "flow_id: Id"
+        },
+        {
+          "name": "node_key",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "node_key: string"
+        },
+        {
+          "name": "operation_code",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "operation_code: string"
+        },
+        {
+          "name": "note",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "note: string | null"
+        },
+        {
+          "name": "expires_at",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "expires_at: string"
+        }
+      ]
+    },
+    {
+      "name": "AttemptSummary",
+      "kind": "interface",
+      "source": "src/modules/executions/types.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "attempt_id",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "attempt_id: Id"
+        },
+        {
+          "name": "attempt_number",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "attempt_number: number"
+        },
+        {
+          "name": "connection_id",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "connection_id: Id"
+        },
+        {
+          "name": "pool_id",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "pool_id?: Id | null"
+        },
+        {
+          "name": "status",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "status: string"
+        },
+        {
+          "name": "error_code",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "error_code?: string | null"
+        },
+        {
+          "name": "latency_ms",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "latency_ms?: number | null"
+        },
+        {
+          "name": "cost",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "cost?: Money | null"
+        },
+        {
+          "name": "provider_request_id",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "provider_request_id?: string | null"
+        },
+        {
+          "name": "model_code",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "model_code?: string | null"
+        }
+      ]
+    },
+    {
+      "name": "AuthenticationError",
+      "kind": "class",
+      "source": "src/errors.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [
+        "SlenError"
+      ],
+      "implements": [],
+      "signature": null,
+      "members": []
+    },
+    {
+      "name": "BlockOptions",
+      "kind": "interface",
+      "source": "src/modules/customers/customers.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [
+        "RequestOptions"
+      ],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "reason",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "reason?: string"
+        }
+      ]
+    },
+    {
+      "name": "BudgetExceededError",
+      "kind": "class",
+      "source": "src/errors.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [
+        "SpendRefusedError"
+      ],
+      "implements": [],
+      "signature": null,
+      "members": []
+    },
+    {
+      "name": "CallOptions",
+      "kind": "interface",
+      "source": "src/http/client.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [
+        "RequestOptions"
+      ],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "idempotencyKey",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "idempotencyKey?: string"
+        }
+      ]
+    },
+    {
+      "name": "ConcurrencyLimitError",
+      "kind": "class",
+      "source": "src/errors.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [
+        "SpendRefusedError"
+      ],
+      "implements": [],
+      "signature": null,
+      "members": []
+    },
+    {
+      "name": "ConnectionError",
+      "kind": "class",
+      "source": "src/errors.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [
+        "SlenError"
+      ],
+      "implements": [],
+      "signature": null,
+      "members": []
+    },
+    {
+      "name": "ContextValue",
+      "kind": "type",
+      "source": "src/modules/operations/operations.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "ContextValue = string | number | boolean | null",
+      "members": []
+    },
+    {
+      "name": "CreditEntry",
+      "kind": "interface",
+      "source": "src/modules/customers/types.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "entry_id",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "entry_id: Id"
+        },
+        {
+          "name": "customer_account_id",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "customer_account_id: Id"
+        },
+        {
+          "name": "external_user_id",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "external_user_id: string"
+        },
+        {
+          "name": "credit_type",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "credit_type: string"
+        },
+        {
+          "name": "entry_type",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "entry_type: CreditEntryType"
+        },
+        {
+          "name": "credits",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "credits: Credits"
+        },
+        {
+          "name": "balance_after",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "balance_after: Credits"
+        },
+        {
+          "name": "available_after",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "available_after: Credits"
+        },
+        {
+          "name": "reservation_id",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "reservation_id: string | null"
+        },
+        {
+          "name": "note",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "note: string | null"
+        },
+        {
+          "name": "created_at",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "created_at: string"
+        }
+      ]
+    },
+    {
+      "name": "CreditEntryType",
+      "kind": "type",
+      "source": "src/modules/customers/types.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "CreditEntryType = 'hold' | 'commit' | 'release' | 'topup' | 'adjust' | 'charge'",
+      "members": []
+    },
+    {
+      "name": "CreditPrice",
+      "kind": "interface",
+      "source": "src/modules/customers/types.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "credit_price_id",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "credit_price_id: Id"
+        },
+        {
+          "name": "project_id",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "project_id: Id"
+        },
+        {
+          "name": "operation_code",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "operation_code: string"
+        },
+        {
+          "name": "credit_type",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "credit_type: string"
+        },
+        {
+          "name": "credits",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "credits: Credits"
+        },
+        {
+          "name": "created_at",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "created_at: string"
+        },
+        {
+          "name": "updated_at",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "updated_at: string"
+        }
+      ]
+    },
+    {
+      "name": "Credits",
+      "kind": "type",
+      "source": "src/wire.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "Credits = string",
+      "members": []
+    },
+    {
+      "name": "CursorMeta",
+      "kind": "interface",
+      "source": "src/wire.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "limit",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "limit: number"
+        },
+        {
+          "name": "next_cursor",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "next_cursor: string | null"
+        }
+      ]
+    },
+    {
+      "name": "Customer",
+      "kind": "interface",
+      "source": "src/modules/customers/types.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "customer_id",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "customer_id: Id"
+        },
+        {
+          "name": "external_user_id",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "external_user_id: string"
+        },
+        {
+          "name": "status",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "status: CustomerStatus"
+        },
+        {
+          "name": "blocked_at",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "blocked_at: string | null"
+        },
+        {
+          "name": "block_reason",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "block_reason: string | null"
+        },
+        {
+          "name": "accounts",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "accounts: CustomerAccount[]"
+        },
+        {
+          "name": "created_at",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "created_at: string"
+        },
+        {
+          "name": "updated_at",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "updated_at: string"
+        }
+      ]
+    },
+    {
+      "name": "CustomerAccount",
+      "kind": "interface",
+      "source": "src/modules/customers/types.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "customer_account_id",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "customer_account_id: Id"
+        },
+        {
+          "name": "customer_id",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "customer_id: Id"
+        },
+        {
+          "name": "project_id",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "project_id: Id"
+        },
+        {
+          "name": "external_user_id",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "external_user_id: string"
+        },
+        {
+          "name": "credit_type",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "credit_type: string"
+        },
+        {
+          "name": "balance",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "balance: Credits"
+        },
+        {
+          "name": "reserved",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "reserved: Credits"
+        },
+        {
+          "name": "available",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "available: Credits"
+        },
+        {
+          "name": "allow_negative",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "allow_negative: boolean"
+        },
+        {
+          "name": "low_balance_threshold",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "low_balance_threshold: Credits"
+        },
+        {
+          "name": "created_at",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "created_at: string"
+        },
+        {
+          "name": "updated_at",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "updated_at: string"
+        }
+      ]
+    },
+    {
+      "name": "CustomerBalanceLowEvent",
+      "kind": "type",
+      "source": "src/modules/webhooks/types.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "CustomerBalanceLowEvent = WebhookEventEnvelope<'customer.balance_low', CustomerBalanceLowEventData>",
+      "members": []
+    },
+    {
+      "name": "CustomerBalanceLowEventData",
+      "kind": "interface",
+      "source": "src/modules/webhooks/types.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "customer_account_id",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "customer_account_id: Id"
+        },
+        {
+          "name": "project_id",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "project_id: Id"
+        },
+        {
+          "name": "external_user_id",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "external_user_id: string"
+        },
+        {
+          "name": "credit_type",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "credit_type: string"
+        },
+        {
+          "name": "balance",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "balance: Credits"
+        },
+        {
+          "name": "reserved",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "reserved: Credits"
+        },
+        {
+          "name": "available",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "available: Credits"
+        },
+        {
+          "name": "threshold",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "threshold: Credits"
+        }
+      ]
+    },
+    {
+      "name": "CustomerBlockedError",
+      "kind": "class",
+      "source": "src/errors.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [
+        "PolicyDeniedError"
+      ],
+      "implements": [],
+      "signature": null,
+      "members": []
+    },
+    {
+      "name": "CustomerListOptions",
+      "kind": "interface",
+      "source": "src/modules/customers/customers.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [
+        "RequestOptions"
+      ],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "cursor",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "cursor?: string"
+        },
+        {
+          "name": "limit",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "limit?: number"
+        },
+        {
+          "name": "search",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "search?: string"
+        },
+        {
+          "name": "status",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "status?: CustomerStatus"
+        },
+        {
+          "name": "creditType",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "creditType?: string"
+        },
+        {
+          "name": "lowBalance",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "lowBalance?: string"
+        }
+      ]
+    },
+    {
+      "name": "CustomerNotFoundError",
+      "kind": "class",
+      "source": "src/errors.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [
+        "SlenError"
+      ],
+      "implements": [],
+      "signature": null,
+      "members": []
+    },
+    {
+      "name": "CustomerStatus",
+      "kind": "type",
+      "source": "src/modules/customers/types.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "CustomerStatus = 'active' | 'blocked'",
+      "members": []
+    },
+    {
+      "name": "CustomersModule",
+      "kind": "class",
+      "source": "src/modules/customers/customers.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "constructor",
+          "kind": "constructor",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": true,
+          "signature": "constructor(context: ModuleContext)"
+        },
+        {
+          "name": "list",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "list(options?: CustomerListOptions): Promise<Page<Customer>>"
+        },
+        {
+          "name": "get",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "get(externalUserId: string, options?: RequestOptions): Promise<Customer>"
+        },
+        {
+          "name": "create",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "create(externalUserId: string, options?: RequestOptions): Promise<Customer>"
+        },
+        {
+          "name": "updateAccount",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "updateAccount(externalUserId: string, creditType: string, options?: AccountOptions): Promise<CustomerAccount>"
+        },
+        {
+          "name": "block",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "block(externalUserId: string, options?: BlockOptions): Promise<Customer>"
+        },
+        {
+          "name": "unblock",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "unblock(externalUserId: string, options?: RequestOptions): Promise<Customer>"
+        },
+        {
+          "name": "delete",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "delete(externalUserId: string, options?: RequestOptions): Promise<void>"
+        },
+        {
+          "name": "topUp",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "topUp(externalUserId: string, credits: string, options?: MovementOptions): Promise<CustomerAccount>"
+        },
+        {
+          "name": "charge",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "charge(externalUserId: string, credits: string, options?: MovementOptions): Promise<CustomerAccount>"
+        },
+        {
+          "name": "adjust",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "adjust(externalUserId: string, credits: string, options?: MovementOptions): Promise<CustomerAccount>"
+        },
+        {
+          "name": "entries",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "entries(externalUserId: string, options?: EntryListOptions): Promise<Page<CreditEntry>>"
+        },
+        {
+          "name": "prices",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "prices(options?: PriceListOptions): Promise<CreditPrice[]>"
+        }
+      ]
+    },
+    {
+      "name": "DEFAULT_BASE_URL",
+      "kind": "const",
+      "source": "src/config.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "DEFAULT_BASE_URL = \"https://api.slen.ai\"",
+      "members": []
+    },
+    {
+      "name": "EntryListOptions",
+      "kind": "interface",
+      "source": "src/modules/customers/customers.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [
+        "RequestOptions"
+      ],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "cursor",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "cursor?: string"
+        },
+        {
+          "name": "limit",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "limit?: number"
+        },
+        {
+          "name": "creditType",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "creditType?: string"
+        },
+        {
+          "name": "entryType",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "entryType?: CreditEntryType"
+        }
+      ]
+    },
+    {
+      "name": "ExecuteOptions",
+      "kind": "interface",
+      "source": "src/modules/operations/operations.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [
+        "CallOptions"
+      ],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "customer",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "customer?: string"
+        },
+        {
+          "name": "creditType",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "creditType?: string"
+        },
+        {
+          "name": "context",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "context?: Readonly<Record<string, ContextValue>>"
+        }
+      ]
+    },
+    {
+      "name": "ExecutionCache",
+      "kind": "interface",
+      "source": "src/modules/executions/types.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "hit",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "hit: boolean"
+        },
+        {
+          "name": "cached_at",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "cached_at: string | null"
+        }
+      ]
+    },
+    {
+      "name": "ExecutionCost",
+      "kind": "interface",
+      "source": "src/modules/executions/types.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "estimated",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "estimated: Money | null"
+        },
+        {
+          "name": "actual",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "actual: Money | null"
+        }
+      ]
+    },
+    {
+      "name": "ExecutionFinishedEvent",
+      "kind": "type",
+      "source": "src/modules/webhooks/types.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "ExecutionFinishedEvent = WebhookEventEnvelope<'execution.finished', ExecutionFinishedEventData>",
+      "members": []
+    },
+    {
+      "name": "ExecutionFinishedEventData",
+      "kind": "interface",
+      "source": "src/modules/webhooks/types.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "execution_id",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "execution_id: Id"
+        },
+        {
+          "name": "flow_id",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "flow_id: Id"
+        },
+        {
+          "name": "operation",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "operation: string"
+        },
+        {
+          "name": "status",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "status: ExecutionStatus"
+        },
+        {
+          "name": "error_code",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "error_code: string | null"
+        }
+      ]
+    },
+    {
+      "name": "ExecutionResult",
+      "kind": "interface",
+      "source": "src/modules/operations/types.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "execution_id",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "execution_id: Id"
+        },
+        {
+          "name": "status",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "status: ExecutionStatus"
+        },
+        {
+          "name": "operation",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "operation: string"
+        },
+        {
+          "name": "output",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "output: Record<string, unknown> | null"
+        },
+        {
+          "name": "error",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "error: { code: string; message: string; } | null"
+        },
+        {
+          "name": "error_code",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "error_code: string | null"
+        },
+        {
+          "name": "error_message",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "error_message: string | null"
+        },
+        {
+          "name": "cost",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "cost: ExecutionCost"
+        },
+        {
+          "name": "cache",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "cache: ExecutionCache"
+        },
+        {
+          "name": "replayed",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "replayed: boolean"
+        },
+        {
+          "name": "waiting_on",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "waiting_on: WaitingOn | null"
+        },
+        {
+          "name": "trace_url",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "trace_url: string"
+        },
+        {
+          "name": "retry_after_seconds",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "retry_after_seconds?: number"
+        }
+      ]
+    },
+    {
+      "name": "ExecutionStatus",
+      "kind": "type",
+      "source": "src/modules/executions/types.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "ExecutionStatus = 'running' | 'queued' | 'waiting' | 'completed' | 'rejected' | 'failed' | 'uncertain'",
+      "members": []
+    },
+    {
+      "name": "ExecutionStatusView",
+      "kind": "interface",
+      "source": "src/modules/executions/types.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "execution_id",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "execution_id: Id"
+        },
+        {
+          "name": "status",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "status: ExecutionStatus"
+        },
+        {
+          "name": "operation",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "operation: string"
+        },
+        {
+          "name": "output",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "output: Record<string, unknown> | null"
+        },
+        {
+          "name": "error_code",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "error_code: string | null"
+        },
+        {
+          "name": "error_message",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "error_message: string | null"
+        },
+        {
+          "name": "cost",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "cost: ExecutionCost"
+        },
+        {
+          "name": "cache",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "cache: ExecutionCache"
+        },
+        {
+          "name": "waiting_on",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "waiting_on: WaitingOn | null"
+        },
+        {
+          "name": "trace_url",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "trace_url: string"
+        },
+        {
+          "name": "retry_after_seconds",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "retry_after_seconds?: number"
+        }
+      ]
+    },
+    {
+      "name": "ExecutionTrace",
+      "kind": "interface",
+      "source": "src/modules/executions/types.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "execution_id",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "execution_id: Id"
+        },
+        {
+          "name": "flow_id",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "flow_id: Id"
+        },
+        {
+          "name": "flow_version_id",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "flow_version_id: Id"
+        },
+        {
+          "name": "flow_name",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "flow_name?: string | null"
+        },
+        {
+          "name": "operation",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "operation?: string | null"
+        },
+        {
+          "name": "operation_id",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "operation_id?: Id | null"
+        },
+        {
+          "name": "status",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "status: ExecutionStatus"
+        },
+        {
+          "name": "error_code",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "error_code?: string | null"
+        },
+        {
+          "name": "error_message",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "error_message?: string | null"
+        },
+        {
+          "name": "cost",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "cost: ExecutionCost"
+        },
+        {
+          "name": "cache",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "cache: ExecutionCache"
+        },
+        {
+          "name": "started_at",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "started_at: string"
+        },
+        {
+          "name": "finished_at",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "finished_at?: string | null"
+        },
+        {
+          "name": "duration_ms",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "duration_ms?: number | null"
+        },
+        {
+          "name": "nodes",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "nodes: FlowExecutionNode[]"
+        },
+        {
+          "name": "events",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "events: FlowExecutionEvent[]"
+        }
+      ]
+    },
+    {
+      "name": "ExecutionsModule",
+      "kind": "class",
+      "source": "src/modules/executions/executions.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "constructor",
+          "kind": "constructor",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": true,
+          "signature": "constructor(context: ModuleContext, clock?: Clock)"
+        },
+        {
+          "name": "get",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "get(executionId: string, options?: RequestOptions): Promise<ExecutionStatusView>"
+        },
+        {
+          "name": "wait",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "wait(executionId: string, options?: WaitOptions): Promise<ExecutionStatusView>"
+        },
+        {
+          "name": "trace",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "trace(executionId: string, options?: RequestOptions): Promise<ExecutionTrace>"
+        }
+      ]
+    },
+    {
+      "name": "FakeFetch",
+      "kind": "class",
+      "source": "src/testing/fake-fetch.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "requests",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly requests: RecordedRequest[]"
+        },
+        {
+          "name": "push",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "push(response: QueuedResponse): this"
+        },
+        {
+          "name": "fetch",
+          "kind": "getter",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "get fetch(): typeof fetch"
+        },
+        {
+          "name": "last",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "last(): RecordedRequest | undefined"
+        }
+      ]
+    },
+    {
+      "name": "FlowExecutionEvent",
+      "kind": "interface",
+      "source": "src/modules/executions/types.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "seq",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "seq: number"
+        },
+        {
+          "name": "type",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "type: string"
+        },
+        {
+          "name": "node_key",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "node_key?: string | null"
+        },
+        {
+          "name": "occurred_at",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "occurred_at: string"
+        },
+        {
+          "name": "payload",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "payload?: Record<string, unknown> | null"
+        }
+      ]
+    },
+    {
+      "name": "FlowExecutionNode",
+      "kind": "interface",
+      "source": "src/modules/executions/types.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "node_key",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "node_key: string"
+        },
+        {
+          "name": "node_type",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "node_type: string"
+        },
+        {
+          "name": "status",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "status: NodeExecutionStatus"
+        },
+        {
+          "name": "output_port",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "output_port?: string | null"
+        },
+        {
+          "name": "cost",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "cost?: Money | null"
+        },
+        {
+          "name": "duration_ms",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "duration_ms?: number | null"
+        },
+        {
+          "name": "started_at",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "started_at: string"
+        },
+        {
+          "name": "finished_at",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "finished_at?: string | null"
+        },
+        {
+          "name": "metadata",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "metadata?: Record<string, unknown> | null"
+        },
+        {
+          "name": "attempts",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "attempts: AttemptSummary[]"
+        },
+        {
+          "name": "label",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "label?: string | null"
+        },
+        {
+          "name": "model",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "model?: string | null"
+        },
+        {
+          "name": "code",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "code?: string | null"
+        }
+      ]
+    },
+    {
+      "name": "FlowRuntimeError",
+      "kind": "class",
+      "source": "src/errors.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [
+        "SlenError"
+      ],
+      "implements": [],
+      "signature": null,
+      "members": []
+    },
+    {
+      "name": "Health",
+      "kind": "interface",
+      "source": "src/slen.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "app",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "app: string"
+        },
+        {
+          "name": "release",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "release: string | null"
+        },
+        {
+          "name": "server",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "server: string"
+        },
+        {
+          "name": "mysql",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "mysql: string"
+        },
+        {
+          "name": "redis",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "redis: string"
+        },
+        {
+          "name": "queue",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "queue: string | null"
+        },
+        {
+          "name": "broadcast",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "broadcast: string | null"
+        },
+        {
+          "name": "opcache_preloaded_files",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "opcache_preloaded_files: number | null"
+        },
+        {
+          "name": "opcache_cached_scripts",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "opcache_cached_scripts: number | null"
+        }
+      ]
+    },
+    {
+      "name": "INVALID_REQUEST",
+      "kind": "const",
+      "source": "src/errors.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "INVALID_REQUEST = \"invalid_request\"",
+      "members": []
+    },
+    {
+      "name": "INVALID_RESPONSE",
+      "kind": "const",
+      "source": "src/errors.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "INVALID_RESPONSE = \"invalid_response\"",
+      "members": []
+    },
+    {
+      "name": "Id",
+      "kind": "type",
+      "source": "src/wire.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "Id = string",
+      "members": []
+    },
+    {
+      "name": "IdempotencyConflictError",
+      "kind": "class",
+      "source": "src/errors.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [
+        "SlenError"
+      ],
+      "implements": [],
+      "signature": null,
+      "members": []
+    },
+    {
+      "name": "InsufficientCreditsError",
+      "kind": "class",
+      "source": "src/errors.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [
+        "SpendRefusedError"
+      ],
+      "implements": [],
+      "signature": null,
+      "members": []
+    },
+    {
+      "name": "InvalidRequestError",
+      "kind": "class",
+      "source": "src/errors.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [
+        "SlenError"
+      ],
+      "implements": [],
+      "signature": null,
+      "members": []
+    },
+    {
+      "name": "InvalidResponseError",
+      "kind": "class",
+      "source": "src/errors.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [
+        "SlenError"
+      ],
+      "implements": [],
+      "signature": null,
+      "members": []
+    },
+    {
+      "name": "LOG_EVENTS",
+      "kind": "const",
+      "source": "src/logger.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "LOG_EVENTS: Readonly<{ readonly request: \"slen.request\"; readonly response: \"slen.response\"; readonly retry: \"slen.retry\"; readonly refused: \"slen.refused\"; readonly unauthorized: \"slen.unauthorized\"; readonly failed: \"slen.failed\"; readonly waitPoll: \"slen.wait.poll\"; readonly waitPollFailed: \"slen.wait.poll_failed\"; readonly webhookRejected: \"slen.webhook.rejected\"; }>",
+      "members": []
+    },
+    {
+      "name": "LogEvent",
+      "kind": "type",
+      "source": "src/logger.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "LogEvent = (typeof LOG_EVENTS)[keyof typeof LOG_EVENTS]",
+      "members": []
+    },
+    {
+      "name": "LoggerSpanRecorder",
+      "kind": "class",
+      "source": "src/observability/recorder.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [
+        "SpanRecorder"
+      ],
+      "signature": null,
+      "members": [
+        {
+          "name": "constructor",
+          "kind": "constructor",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "constructor(logger?: SpanLogger)"
+        },
+        {
+          "name": "record",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "record(span: SlenSpan): void"
+        }
+      ]
+    },
+    {
+      "name": "MemorySpanRecorder",
+      "kind": "class",
+      "source": "src/observability/recorder.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [
+        "SpanRecorder"
+      ],
+      "signature": null,
+      "members": [
+        {
+          "name": "spans",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly spans: SlenSpan[]"
+        },
+        {
+          "name": "record",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "record(span: SlenSpan): void"
+        },
+        {
+          "name": "last",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "last(): SlenSpan | undefined"
+        }
+      ]
+    },
+    {
+      "name": "Money",
+      "kind": "type",
+      "source": "src/wire.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "Money = string",
+      "members": []
+    },
+    {
+      "name": "MovementOptions",
+      "kind": "interface",
+      "source": "src/modules/customers/customers.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [
+        "CallOptions"
+      ],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "creditType",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "creditType?: string"
+        },
+        {
+          "name": "note",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "note?: string"
+        }
+      ]
+    },
+    {
+      "name": "MultiSpanRecorder",
+      "kind": "class",
+      "source": "src/observability/recorder.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [
+        "SpanRecorder"
+      ],
+      "signature": null,
+      "members": [
+        {
+          "name": "constructor",
+          "kind": "constructor",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "constructor(recorders: readonly SpanRecorder[])"
+        },
+        {
+          "name": "record",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "record(span: SlenSpan): void"
+        },
+        {
+          "name": "flush",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "flush(): Promise<void>"
+        }
+      ]
+    },
+    {
+      "name": "NOOP_LOGGER",
+      "kind": "const",
+      "source": "src/logger.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "NOOP_LOGGER: SlenLogger",
+      "members": []
+    },
+    {
+      "name": "NodeExecutionStatus",
+      "kind": "type",
+      "source": "src/modules/executions/types.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "NodeExecutionStatus = 'completed' | 'failed'",
+      "members": []
+    },
+    {
+      "name": "NullSpanRecorder",
+      "kind": "class",
+      "source": "src/observability/recorder.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [
+        "SpanRecorder"
+      ],
+      "signature": null,
+      "members": [
+        {
+          "name": "record",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "record(): void"
+        }
+      ]
+    },
+    {
+      "name": "OperationLimitExceededError",
+      "kind": "class",
+      "source": "src/errors.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [
+        "SpendRefusedError"
+      ],
+      "implements": [],
+      "signature": null,
+      "members": []
+    },
+    {
+      "name": "OperationUncertainError",
+      "kind": "class",
+      "source": "src/errors.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [
+        "SlenError"
+      ],
+      "implements": [],
+      "signature": null,
+      "members": []
+    },
+    {
+      "name": "OperationsModule",
+      "kind": "class",
+      "source": "src/modules/operations/operations.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "constructor",
+          "kind": "constructor",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": true,
+          "signature": "constructor(context: ModuleContext)"
+        },
+        {
+          "name": "execute",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "execute(operation: string, input: Record<string, unknown>, options?: ExecuteOptions): Promise<ExecutionResult>"
+        },
+        {
+          "name": "executeAsync",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "executeAsync(operation: string, input: Record<string, unknown>, options?: ExecuteOptions): Promise<ExecutionResult>"
+        }
+      ]
+    },
+    {
+      "name": "OtelSpanLike",
+      "kind": "interface",
+      "source": "src/observability/otel.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "setAttributes",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "setAttributes(attributes: Record<string, string | number | boolean>): unknown"
+        },
+        {
+          "name": "setStatus",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "setStatus(status: { code: number; message?: string; }): unknown"
+        },
+        {
+          "name": "end",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "end(endTime?: number): void"
+        }
+      ]
+    },
+    {
+      "name": "OtelSpanRecorder",
+      "kind": "class",
+      "source": "src/observability/otel.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [
+        "SpanRecorder"
+      ],
+      "signature": null,
+      "members": [
+        {
+          "name": "constructor",
+          "kind": "constructor",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "constructor(tracer: OtelTracerLike)"
+        },
+        {
+          "name": "record",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "record(span: SlenSpan): void"
+        }
+      ]
+    },
+    {
+      "name": "OtelTracerLike",
+      "kind": "interface",
+      "source": "src/observability/otel.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "startSpan",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "startSpan(name: string, options?: { startTime?: number; kind?: number; }): OtelSpanLike"
+        }
+      ]
+    },
+    {
+      "name": "OtlpExporterOptions",
+      "kind": "interface",
+      "source": "src/observability/otlp.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "endpoint",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "endpoint: string"
+        },
+        {
+          "name": "headers",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "headers?: Record<string, string>"
+        },
+        {
+          "name": "serviceName",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "serviceName?: string"
+        },
+        {
+          "name": "resourceAttributes",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "resourceAttributes?: Record<string, string>"
+        },
+        {
+          "name": "maxQueueSize",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "maxQueueSize?: number"
+        },
+        {
+          "name": "flushIntervalMs",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "flushIntervalMs?: number"
+        },
+        {
+          "name": "timeoutMs",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "timeoutMs?: number"
+        },
+        {
+          "name": "maxPendingBatches",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "maxPendingBatches?: number"
+        },
+        {
+          "name": "fetch",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "fetch?: typeof fetch"
+        },
+        {
+          "name": "onError",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "onError?: (error: Error, droppedSpans: number) => void"
+        }
+      ]
+    },
+    {
+      "name": "OtlpSpanRecorder",
+      "kind": "class",
+      "source": "src/observability/otlp.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [
+        "SpanRecorder"
+      ],
+      "signature": null,
+      "members": [
+        {
+          "name": "constructor",
+          "kind": "constructor",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "constructor(options: OtlpExporterOptions)"
+        },
+        {
+          "name": "record",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "record(span: SlenSpan): void"
+        },
+        {
+          "name": "flush",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "flush(): Promise<void>"
+        },
+        {
+          "name": "shutdown",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "shutdown(): Promise<void>"
+        }
+      ]
+    },
+    {
+      "name": "OverrunApprovalRequiredError",
+      "kind": "class",
+      "source": "src/errors.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [
+        "SpendRefusedError"
+      ],
+      "implements": [],
+      "signature": null,
+      "members": []
+    },
+    {
+      "name": "OverrunStoppedError",
+      "kind": "class",
+      "source": "src/errors.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [
+        "SpendRefusedError"
+      ],
+      "implements": [],
+      "signature": null,
+      "members": []
+    },
+    {
+      "name": "Page",
+      "kind": "interface",
+      "source": "src/wire.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [
+        "T"
+      ],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "data",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "data: T[]"
+        },
+        {
+          "name": "meta",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "meta: CursorMeta"
+        }
+      ]
+    },
+    {
+      "name": "ParkReason",
+      "kind": "type",
+      "source": "src/modules/executions/types.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "ParkReason = 'queue_node' | 'approval' | 'rate_limit_queue' | 'async_dispatch' | 'provider_background'",
+      "members": []
+    },
+    {
+      "name": "PolicyDeniedError",
+      "kind": "class",
+      "source": "src/errors.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [
+        "SlenError"
+      ],
+      "implements": [],
+      "signature": null,
+      "members": []
+    },
+    {
+      "name": "PollErrorListener",
+      "kind": "type",
+      "source": "src/modules/executions/wait.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "PollErrorListener = (error: SlenError, failuresInARow: number) => void | Promise<void>",
+      "members": []
+    },
+    {
+      "name": "PriceListOptions",
+      "kind": "interface",
+      "source": "src/modules/customers/customers.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [
+        "RequestOptions"
+      ],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "operationCode",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "operationCode?: string"
+        },
+        {
+          "name": "creditType",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "creditType?: string"
+        }
+      ]
+    },
+    {
+      "name": "ProviderError",
+      "kind": "class",
+      "source": "src/errors.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [
+        "SlenError"
+      ],
+      "implements": [],
+      "signature": null,
+      "members": []
+    },
+    {
+      "name": "QueuedFrame",
+      "kind": "interface",
+      "source": "src/testing/fake-fetch.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "text",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "text: string"
+        },
+        {
+          "name": "delayMs",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "delayMs?: number"
+        }
+      ]
+    },
+    {
+      "name": "QueuedResponse",
+      "kind": "interface",
+      "source": "src/testing/fake-fetch.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "status",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "status?: number"
+        },
+        {
+          "name": "body",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "body?: unknown"
+        },
+        {
+          "name": "text",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "text?: string"
+        },
+        {
+          "name": "frames",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "frames?: Array<string | QueuedFrame>"
+        },
+        {
+          "name": "delayMs",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "delayMs?: number"
+        },
+        {
+          "name": "headers",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "headers?: Record<string, string>"
+        }
+      ]
+    },
+    {
+      "name": "RateLimitError",
+      "kind": "class",
+      "source": "src/errors.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [
+        "SlenError"
+      ],
+      "implements": [],
+      "signature": null,
+      "members": []
+    },
+    {
+      "name": "RecordedRequest",
+      "kind": "interface",
+      "source": "src/testing/fake-fetch.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "url",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "url: string"
+        },
+        {
+          "name": "method",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "method: string"
+        },
+        {
+          "name": "headers",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "headers: Record<string, string>"
+        },
+        {
+          "name": "body",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "body: Record<string, unknown> | null"
+        }
+      ]
+    },
+    {
+      "name": "RequestOptions",
+      "kind": "interface",
+      "source": "src/http/client.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "signal",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "signal?: AbortSignal"
+        },
+        {
+          "name": "timeoutMs",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "timeoutMs?: number"
+        },
+        {
+          "name": "retries",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "retries?: number"
+        }
+      ]
+    },
+    {
+      "name": "SPAN_ATTRIBUTE_NAMES",
+      "kind": "const",
+      "source": "src/observability/span.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "SPAN_ATTRIBUTE_NAMES: Readonly<Record<SpanField, string>>",
+      "members": []
+    },
+    {
+      "name": "SPAN_FIELDS",
+      "kind": "const",
+      "source": "src/observability/span.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "SPAN_FIELDS: readonly [ \"operation\", \"outcome\", \"status\", \"durationMs\", \"executionId\", \"operationCode\", \"estimated\", \"actual\", \"errorCode\", \"cacheHit\" ]",
+      "members": []
+    },
+    {
+      "name": "SPAN_OPERATIONS",
+      "kind": "const",
+      "source": "src/observability/span.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "SPAN_OPERATIONS: readonly [ \"operations.execute\", \"operations.execute_async\", \"executions.wait\" ]",
+      "members": []
+    },
+    {
+      "name": "ServiceUnavailableError",
+      "kind": "class",
+      "source": "src/errors.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [
+        "SlenError"
+      ],
+      "implements": [],
+      "signature": null,
+      "members": []
+    },
+    {
+      "name": "Slen",
+      "kind": "class",
+      "source": "src/slen.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "operations",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly operations: OperationsModule"
+        },
+        {
+          "name": "executions",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly executions: ExecutionsModule"
+        },
+        {
+          "name": "customers",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly customers: CustomersModule"
+        },
+        {
+          "name": "webhooks",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly webhooks: WebhooksModule"
+        },
+        {
+          "name": "constructor",
+          "kind": "constructor",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "constructor(options?: SlenOptions)"
+        },
+        {
+          "name": "withLogger",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "withLogger(logger: SlenLogger): Slen"
+        },
+        {
+          "name": "health",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "health(options?: RequestOptions): Promise<Health>"
+        },
+        {
+          "name": "flush",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "flush(): Promise<void>"
+        }
+      ]
+    },
+    {
+      "name": "SlenConfig",
+      "kind": "interface",
+      "source": "src/config.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "apiKey",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly apiKey: string"
+        },
+        {
+          "name": "baseUrl",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly baseUrl: string"
+        },
+        {
+          "name": "timeoutMs",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly timeoutMs: number"
+        },
+        {
+          "name": "retries",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly retries: number"
+        },
+        {
+          "name": "headers",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly headers: Readonly<Record<string, string>>"
+        },
+        {
+          "name": "logger",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly logger: SlenLogger"
+        },
+        {
+          "name": "fetch",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly fetch: typeof fetch"
+        },
+        {
+          "name": "webhookSecret",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly webhookSecret: string | null"
+        },
+        {
+          "name": "webhookToleranceSeconds",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly webhookToleranceSeconds: number"
+        }
+      ]
+    },
+    {
+      "name": "SlenError",
+      "kind": "class",
+      "source": "src/errors.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [
+        "Error"
+      ],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "code",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly code: string | null"
+        },
+        {
+          "name": "status",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly status: number | null"
+        },
+        {
+          "name": "details",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly details: Record<string, unknown>"
+        },
+        {
+          "name": "requestId",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly requestId: string | null"
+        },
+        {
+          "name": "retryAfterSeconds",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly retryAfterSeconds: number | null"
+        },
+        {
+          "name": "constructor",
+          "kind": "constructor",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "constructor(message: string, init?: Partial<SlenErrorInit>)"
+        }
+      ]
+    },
+    {
+      "name": "SlenErrorInit",
+      "kind": "interface",
+      "source": "src/errors.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "code",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly code: string | null"
+        },
+        {
+          "name": "status",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly status: number | null"
+        },
+        {
+          "name": "details",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly details: Record<string, unknown>"
+        },
+        {
+          "name": "requestId",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly requestId: string | null"
+        },
+        {
+          "name": "retryAfterSeconds",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly retryAfterSeconds: number | null"
+        }
+      ]
+    },
+    {
+      "name": "SlenLogger",
+      "kind": "interface",
+      "source": "src/logger.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "debug",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "debug(message: string, context?: Record<string, unknown>): void"
+        },
+        {
+          "name": "info",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "info(message: string, context?: Record<string, unknown>): void"
+        },
+        {
+          "name": "warn",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "warn(message: string, context?: Record<string, unknown>): void"
+        },
+        {
+          "name": "error",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "error(message: string, context?: Record<string, unknown>): void"
+        }
+      ]
+    },
+    {
+      "name": "SlenOptions",
+      "kind": "interface",
+      "source": "src/config.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "apiKey",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "apiKey?: string"
+        },
+        {
+          "name": "baseUrl",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "baseUrl?: string"
+        },
+        {
+          "name": "timeoutMs",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "timeoutMs?: number"
+        },
+        {
+          "name": "retries",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "retries?: number"
+        },
+        {
+          "name": "logger",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "logger?: SlenLogger"
+        },
+        {
+          "name": "spanRecorder",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "spanRecorder?: SpanRecorder"
+        },
+        {
+          "name": "otlp",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "otlp?: OtlpExporterOptions"
+        },
+        {
+          "name": "fetch",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "fetch?: typeof fetch"
+        },
+        {
+          "name": "headers",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "headers?: Record<string, string>"
+        },
+        {
+          "name": "webhookSecret",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "webhookSecret?: string"
+        },
+        {
+          "name": "webhookToleranceSeconds",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "webhookToleranceSeconds?: number"
+        }
+      ]
+    },
+    {
+      "name": "SlenSpan",
+      "kind": "interface",
+      "source": "src/observability/span.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "operation",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly operation: string"
+        },
+        {
+          "name": "outcome",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly outcome: SpanOutcome"
+        },
+        {
+          "name": "status",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly status: string | null"
+        },
+        {
+          "name": "durationMs",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly durationMs: number"
+        },
+        {
+          "name": "executionId",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly executionId: string | null"
+        },
+        {
+          "name": "operationCode",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly operationCode: string | null"
+        },
+        {
+          "name": "estimated",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly estimated: string | null"
+        },
+        {
+          "name": "actual",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly actual: string | null"
+        },
+        {
+          "name": "errorCode",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly errorCode: string | null"
+        },
+        {
+          "name": "cacheHit",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly cacheHit: boolean | null"
+        }
+      ]
+    },
+    {
+      "name": "SpanAttributes",
+      "kind": "type",
+      "source": "src/observability/span.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "SpanAttributes = Record<string, string | number | boolean>",
+      "members": []
+    },
+    {
+      "name": "SpanField",
+      "kind": "type",
+      "source": "src/observability/span.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "SpanField = (typeof SPAN_FIELDS)[number]",
+      "members": []
+    },
+    {
+      "name": "SpanLogger",
+      "kind": "interface",
+      "source": "src/observability/recorder.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "info",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "info(message: string, attributes: Record<string, unknown>): void"
+        }
+      ]
+    },
+    {
+      "name": "SpanOperation",
+      "kind": "type",
+      "source": "src/observability/span.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "SpanOperation = (typeof SPAN_OPERATIONS)[number]",
+      "members": []
+    },
+    {
+      "name": "SpanOutcome",
+      "kind": "type",
+      "source": "src/observability/span.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "SpanOutcome = 'ok' | 'refused' | 'error'",
+      "members": []
+    },
+    {
+      "name": "SpanRecorder",
+      "kind": "interface",
+      "source": "src/observability/recorder.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "record",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "record(span: SlenSpan): void"
+        },
+        {
+          "name": "flush",
+          "kind": "method",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "flush?(): Promise<void>"
+        }
+      ]
+    },
+    {
+      "name": "SpendRefusedError",
+      "kind": "class",
+      "source": "src/errors.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [
+        "SlenError"
+      ],
+      "implements": [],
+      "signature": null,
+      "members": []
+    },
+    {
+      "name": "TimeoutError",
+      "kind": "class",
+      "source": "src/errors.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [
+        "SlenError"
+      ],
+      "implements": [],
+      "signature": null,
+      "members": []
+    },
+    {
+      "name": "TypedWebhookEventType",
+      "kind": "type",
+      "source": "src/modules/webhooks/types.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "TypedWebhookEventType = 'execution.finished' | 'customer.balance_low' | 'approval.requested' | 'approval.decided'",
+      "members": []
+    },
+    {
+      "name": "UnknownWebhookEvent",
+      "kind": "type",
+      "source": "src/modules/webhooks/types.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "UnknownWebhookEvent = WebhookEventEnvelope<Exclude<WebhookEventType, TypedWebhookEventType>, Readonly<Record<string, unknown>>>",
+      "members": []
+    },
+    {
+      "name": "VerifyOptions",
+      "kind": "interface",
+      "source": "src/modules/webhooks/webhooks.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "secret",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "secret?: string"
+        },
+        {
+          "name": "toleranceSeconds",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "toleranceSeconds?: number"
+        },
+        {
+          "name": "now",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "now?: Date"
+        }
+      ]
+    },
+    {
+      "name": "WEBHOOK_EVENT_TYPES",
+      "kind": "const",
+      "source": "src/modules/webhooks/types.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "WEBHOOK_EVENT_TYPES: readonly [ \"reservation.created\", \"reservation.captured\", \"reservation.released\", \"reservation.expired\", \"reservation.overrun\", \"budget.threshold_reached\", \"budget.exceeded\", \"operation.authorized\", \"operation.denied\", \"operation.started\", \"operation.completed\", \"operation.failed\", \"operation.uncertain\", \"flow.published\", \"flow.rolled_back\", \"connection.cooldown_started\", \"connection.health_changed\", \"approval.requested\", \"approval.decided\", \"execution.finished\", \"alert.opened\", \"alert.resolved\", \"overrun.decided\", \"customer.balance_low\", \"ledger.degraded\", \"ledger.restored\" ]",
+      "members": []
+    },
+    {
+      "name": "WEBHOOK_PAYLOAD_INVALID",
+      "kind": "const",
+      "source": "src/errors.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "WEBHOOK_PAYLOAD_INVALID = \"webhook_payload_invalid\"",
+      "members": []
+    },
+    {
+      "name": "WEBHOOK_SIGNATURE_INVALID",
+      "kind": "const",
+      "source": "src/errors.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "WEBHOOK_SIGNATURE_INVALID = \"webhook_signature_invalid\"",
+      "members": []
+    },
+    {
+      "name": "WaitOptions",
+      "kind": "interface",
+      "source": "src/modules/executions/wait.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "timeoutSeconds",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "timeoutSeconds?: number"
+        },
+        {
+          "name": "onPollError",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "onPollError?: PollErrorListener"
+        },
+        {
+          "name": "signal",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "signal?: AbortSignal"
+        }
+      ]
+    },
+    {
+      "name": "WaitingOn",
+      "kind": "interface",
+      "source": "src/modules/executions/types.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "node_key",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "node_key: string"
+        },
+        {
+          "name": "type",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "type: ParkReason"
+        },
+        {
+          "name": "resume_at",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "resume_at: string | null"
+        }
+      ]
+    },
+    {
+      "name": "WebhookEvent",
+      "kind": "type",
+      "source": "src/modules/webhooks/types.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "WebhookEvent = ExecutionFinishedEvent | CustomerBalanceLowEvent | ApprovalRequestedEvent | ApprovalDecidedEvent | UnknownWebhookEvent",
+      "members": []
+    },
+    {
+      "name": "WebhookEventEnvelope",
+      "kind": "interface",
+      "source": "src/modules/webhooks/types.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [
+        "Type extends string",
+        "Data"
+      ],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "id",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "id: Id"
+        },
+        {
+          "name": "type",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "type: Type"
+        },
+        {
+          "name": "created_at",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "created_at: string"
+        },
+        {
+          "name": "data",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "data: Data"
+        }
+      ]
+    },
+    {
+      "name": "WebhookEventType",
+      "kind": "type",
+      "source": "src/modules/webhooks/types.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "WebhookEventType = (typeof WEBHOOK_EVENT_TYPES)[number]",
+      "members": []
+    },
+    {
+      "name": "WebhookPayload",
+      "kind": "type",
+      "source": "src/modules/webhooks/webhooks.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "WebhookPayload = string | Uint8Array",
+      "members": []
+    },
+    {
+      "name": "WebhookSignatureError",
+      "kind": "class",
+      "source": "src/errors.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [
+        "SlenError"
+      ],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "reason",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly reason: WebhookSignatureReason"
+        },
+        {
+          "name": "constructor",
+          "kind": "constructor",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "constructor(message: string, init: Partial<SlenErrorInit> & { readonly reason: WebhookSignatureReason; })"
+        }
+      ]
+    },
+    {
+      "name": "WebhookSignatureReason",
+      "kind": "type",
+      "source": "src/errors.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "WebhookSignatureReason = 'missing_header' | 'malformed_header' | 'outside_tolerance' | 'no_matching_signature'",
+      "members": []
+    },
+    {
+      "name": "WebhooksModule",
+      "kind": "class",
+      "source": "src/modules/webhooks/webhooks.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "constructor",
+          "kind": "constructor",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "constructor(options?: WebhooksOptions)"
+        },
+        {
+          "name": "verify",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "verify(payload: WebhookPayload, signatureHeader: string | null | undefined, options?: VerifyOptions): Promise<boolean>"
+        },
+        {
+          "name": "constructEvent",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "constructEvent(payload: WebhookPayload, signatureHeader: string | null | undefined, options?: VerifyOptions): Promise<WebhookEvent>"
+        }
+      ]
+    },
+    {
+      "name": "WebhooksOptions",
+      "kind": "interface",
+      "source": "src/modules/webhooks/webhooks.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "secret",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "secret?: string | null"
+        },
+        {
+          "name": "toleranceSeconds",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "toleranceSeconds?: number"
+        },
+        {
+          "name": "logger",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "logger?: SlenLogger"
+        }
+      ]
+    },
+    {
+      "name": "apiBase",
+      "kind": "function",
+      "source": "src/config.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "apiBase(config: Pick<SlenConfig, 'baseUrl'>): string",
+      "members": []
+    },
+    {
+      "name": "errorFromResponse",
+      "kind": "function",
+      "source": "src/http/error-mapper.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "errorFromResponse(status: number, body: unknown, requestId: string | null): SlenError",
+      "members": []
+    },
+    {
+      "name": "generateIdempotencyKey",
+      "kind": "function",
+      "source": "src/idempotency.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "generateIdempotencyKey(): string",
+      "members": []
+    },
+    {
+      "name": "idempotencyKeyForJob",
+      "kind": "function",
+      "source": "src/idempotency.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "idempotencyKeyForJob(jobId: string, operation: string): string",
+      "members": []
+    },
+    {
+      "name": "isCompleted",
+      "kind": "function",
+      "source": "src/modules/executions/wait.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "isCompleted(run: { readonly status: ExecutionStatus; }): boolean",
+      "members": []
+    },
+    {
+      "name": "isFinished",
+      "kind": "function",
+      "source": "src/modules/executions/wait.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "isFinished(run: { readonly status: ExecutionStatus; }): boolean",
+      "members": []
+    },
+    {
+      "name": "isPending",
+      "kind": "function",
+      "source": "src/modules/executions/wait.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "isPending(run: { readonly status: ExecutionStatus; }): boolean",
+      "members": []
+    },
+    {
+      "name": "isRejected",
+      "kind": "function",
+      "source": "src/modules/executions/wait.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "isRejected(run: { readonly status: ExecutionStatus; }): boolean",
+      "members": []
+    },
+    {
+      "name": "otelSpanRecorder",
+      "kind": "function",
+      "source": "src/observability/otel.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "otelSpanRecorder(tracerName?: string): Promise<OtelSpanRecorder | null>",
+      "members": []
+    },
+    {
+      "name": "resolveConfig",
+      "kind": "function",
+      "source": "src/config.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "resolveConfig(options: SlenOptions): SlenConfig",
+      "members": []
+    },
+    {
+      "name": "spanAttributes",
+      "kind": "function",
+      "source": "src/observability/span.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "spanAttributes(span: SlenSpan): SpanAttributes",
+      "members": []
+    },
+    {
+      "name": "webhooks",
+      "kind": "const",
+      "source": "src/modules/webhooks/webhooks.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "webhooks: WebhooksModule",
+      "members": []
+    }
+  ]
+}

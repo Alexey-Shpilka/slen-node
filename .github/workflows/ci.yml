@@ -1,0 +1,50 @@
+name: ci
+on:
+  push:
+    branches: [master]
+  pull_request: {}
+  workflow_dispatch: {}
+permissions: { contents: read }
+concurrency: { group: 'ci-${{ github.event_name }}-${{ github.ref }}', cancel-in-progress: true }
+
+# No job reads a secret. Every checkout is `persist-credentials: false`: no job
+# pushes, and the steps that follow run other people's code (npm ci).
+# See .github/AGENTS.md.
+
+jobs:
+  typescript:
+    name: typescript (node 22)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: { persist-credentials: false }
+      # 22, not the 20.3 of `engines`: the toolchain (vite) needs more. The
+      # package's own floor has the job below.
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with: { node-version: 22, cache: npm }
+      - run: npm ci                                     # `prepare` builds dist/ as well
+      - run: npm run typecheck                          # tsc over src, test and the help examples
+      - run: npm test                                   # vitest run
+      - run: npm run build                              # ESM + CJS, the dist/ that gets published
+      - run: node scripts/export-help-slice.mjs --check
+      - run: npm pack --dry-run                         # what an install gets: dist/, README, LICENSE, CHANGELOG
+
+  # package.json declares `engines.node: >=20.3`. The suite cannot run there, so
+  # the floor is held by what ships: dist/ is built on 22 and then loaded on
+  # exactly 20.3.0, both module systems, through the paths that lean on the
+  # runtime (Web Crypto, fetch, AbortController). See scripts/floor.mjs.
+  typescript-floor:
+    name: node 20.3 floor
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: { persist-credentials: false }
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with: { node-version: 22, cache: npm }
+      - run: npm ci                                     # `prepare` builds dist/
+      # The exact floor, not `20`: a later 20.x has more than 20.3 does.
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with: { node-version: '20.3.0' }
+      - run: node scripts/floor.mjs

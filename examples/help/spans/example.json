@@ -1,0 +1,34 @@
+{
+  "id": "spans",
+  "status": "ready",
+  "summary": "Spans written to a logger: the recorder each SDK ships for a log (LoggerSpanRecorder, Psr3SpanRecorder) handed to the SDK, one request through a flow, and the line the span becomes — its name, outcome, status, operation code, run and estimate.",
+  "languages": ["node", "php"],
+  "regions": ["recorder", "client", "send"],
+  "responses": [
+    {
+      "status": 200,
+      "body": {
+        "data": {
+          "execution_id": "74438200973594710",
+          "status": "completed",
+          "operation": "generate_email",
+          "output": {
+            "model": "gpt-4o-mini",
+            "content": "Hi Ada, just checking in on the proposal I sent last week.",
+            "finish_reason": "stop",
+            "tool_calls": null,
+            "usage": { "input_tokens": 16, "output_tokens": 16, "cached_input_tokens": 0 }
+          },
+          "error": null,
+          "error_code": null,
+          "error_message": null,
+          "cost": { "estimated": "0.00061590", "actual": null },
+          "cache": { "hit": false, "cached_at": null },
+          "replayed": false,
+          "waiting_on": null,
+          "trace_url": "/v1/executions/74438200973594710"
+        }
+      }
+    }
+  ]
+}

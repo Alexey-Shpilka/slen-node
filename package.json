@@ -1,0 +1,69 @@
+{
+  "name": "@slen/sdk",
+  "version": "0.3.0",
+  "description": "Slen TypeScript SDK — run flows and read their outcome, manage end customers and their credits, verify webhooks.",
+  "license": "MIT",
+  "author": "Alexey Shpilka",
+  "homepage": "https://slen.ai/en/docs/sdk/overview",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Alexey-Shpilka/slen-node.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Alexey-Shpilka/slen-node/issues"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=20.3"
+  },
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/esm/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/esm/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\"",
+    "build": "npm run clean && tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json && node scripts/finish-build.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "floor": "node scripts/floor.mjs",
+    "prepare": "npm run build"
+  },
+  "keywords": [
+    "slen",
+    "llm",
+    "flows",
+    "credits",
+    "webhooks",
+    "opentelemetry"
+  ],
+  "peerDependencies": {
+    "@opentelemetry/api": ">=1.7.0"
+  },
+  "peerDependenciesMeta": {
+    "@opentelemetry/api": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.5",
+    "yaml": "^2.9.1"
+  }
+}

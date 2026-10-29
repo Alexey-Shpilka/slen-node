@@ -1,0 +1,36 @@
+{
+  "calls": [
+    {
+      "method": "POST",
+      "path": "/v1/operations/execute",
+      "headers": { "Idempotency-Key": "job:a1f7c2e9:generate_email" },
+      "body": {
+        "operation": "generate_email",
+        "input": { "messages": [{ "role": "user", "content": "Write a short follow-up email." }] }
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/v1/operations/execute",
+      "headers": { "Idempotency-Key": "job:a1f7c2e9:generate_email" },
+      "body": {
+        "operation": "generate_email",
+        "input": { "messages": [{ "role": "user", "content": "Write a short follow-up email." }] }
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/v1/operations/execute",
+      "headers": { "Idempotency-Key": "job:a1f7c2e9:generate_email" },
+      "body": {
+        "operation": "generate_email",
+        "input": { "messages": [{ "role": "user", "content": "Write a short thank-you email." }] }
+      }
+    }
+  ],
+  "prints": [
+    "completed",
+    "Execution 74438200973594720 ran once. This answer is a replay.",
+    "Refused: idempotency_conflict"
+  ]
+}

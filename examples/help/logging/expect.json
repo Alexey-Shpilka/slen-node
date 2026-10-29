@@ -1,0 +1,14 @@
+{
+  "calls": [
+    {
+      "method": "POST",
+      "path": "/v1/operations/execute",
+      "headers": { "Idempotency-Key": "order-77:email" },
+      "body": {
+        "operation": "generate_email",
+        "input": { "messages": [{ "role": "user", "content": "Write a short follow-up email." }] }
+      }
+    }
+  ],
+  "prints": ["debug slen.request POST /v1/operations/execute", "debug slen.response POST /v1/operations/execute 200"]
+}

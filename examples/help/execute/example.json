@@ -1,0 +1,34 @@
+{
+  "id": "execute",
+  "status": "ready",
+  "summary": "A request through a flow with the context of the call: the input, the customer and a value of your own in context, your own idempotency key, and the answer read by its status.",
+  "languages": ["node", "php"],
+  "regions": ["client", "send", "result"],
+  "responses": [
+    {
+      "status": 200,
+      "body": {
+        "data": {
+          "execution_id": "74438200973594710",
+          "status": "completed",
+          "operation": "generate_email",
+          "output": {
+            "model": "gpt-4o-mini",
+            "content": "Hi Ada, just checking in on the proposal I sent last week.",
+            "finish_reason": "stop",
+            "tool_calls": null,
+            "usage": { "input_tokens": 16, "output_tokens": 16, "cached_input_tokens": 0 }
+          },
+          "error": null,
+          "error_code": null,
+          "error_message": null,
+          "cost": { "estimated": "0.00061590", "actual": null },
+          "cache": { "hit": false, "cached_at": null },
+          "replayed": false,
+          "waiting_on": null,
+          "trace_url": "/v1/executions/74438200973594710"
+        }
+      }
+    }
+  ]
+}

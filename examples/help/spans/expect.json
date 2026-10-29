@@ -1,0 +1,14 @@
+{
+  "calls": [
+    {
+      "method": "POST",
+      "path": "/v1/operations/execute",
+      "headers": { "Idempotency-Key": "order-61:email" },
+      "body": {
+        "operation": "generate_email",
+        "input": { "messages": [{ "role": "user", "content": "Write a short follow-up email to Ada." }] }
+      }
+    }
+  ],
+  "prints": ["slen.span: operations.execute ok completed generate_email 74438200973594710 0.00061590"]
+}

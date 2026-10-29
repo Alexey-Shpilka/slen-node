@@ -1,0 +1,21 @@
+{
+  "calls": [
+    {
+      "method": "POST",
+      "path": "/v1/operations/execute",
+      "headers": { "Idempotency-Key": "report-2026-q3:summary" },
+      "body": {
+        "operation": "summarize_report",
+        "input": { "messages": [{ "role": "user", "content": "Summarize the third-quarter report." }] },
+        "execution_mode": "async"
+      }
+    },
+    { "method": "GET", "path": "/v1/executions/74438200973594800/status" },
+    { "method": "GET", "path": "/v1/executions/74438200973594800/status" }
+  ],
+  "prints": [
+    "queued",
+    "Status read failed (1 in a row): API rate limit exceeded",
+    "Revenue grew 12% quarter over quarter; churn held at 2.1%."
+  ]
+}

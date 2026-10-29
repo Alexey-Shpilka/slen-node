@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "exactOptionalPropertyTypes": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "useUnknownInCatchVariables": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    // The examples of the help section (examples/help) import the package the
+    // way a consumer does, by its published name. Here that name is the source
+    // tree, so `npm run typecheck` holds them against the code as it is now.
+    "paths": {
+      "@slen/sdk": ["./src/index.ts"]
+    }
+  },
+  // The builds (tsconfig.esm.json, tsconfig.cjs.json) include `src` alone: an
+  // example is type-checked, never emitted.
+  "include": ["src", "test", "examples/help/**/node.ts"]
+}

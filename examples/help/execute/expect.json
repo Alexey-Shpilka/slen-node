@@ -1,0 +1,15 @@
+{
+  "calls": [
+    {
+      "method": "POST",
+      "path": "/v1/operations/execute",
+      "headers": { "Idempotency-Key": "order-57:email" },
+      "body": {
+        "operation": "generate_email",
+        "input": { "messages": [{ "role": "user", "content": "Write a short follow-up email to Ada." }] },
+        "context": { "user_id": "user_8421", "plan": "pro" }
+      }
+    }
+  ],
+  "prints": ["Hi Ada, just checking in on the proposal I sent last week."]
+}

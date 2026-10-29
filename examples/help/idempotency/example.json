@@ -1,0 +1,69 @@
+{
+  "id": "idempotency",
+  "status": "ready",
+  "summary": "A key that names the unit of work: the key of a queue job, a repeat of the job answered by the execution it opened (replayed), and the same key over another body refused with idempotency_conflict.",
+  "languages": ["node", "php"],
+  "regions": ["client", "key", "send", "repeat", "conflict"],
+  "responses": [
+    {
+      "status": 200,
+      "body": {
+        "data": {
+          "execution_id": "74438200973594720",
+          "status": "completed",
+          "operation": "generate_email",
+          "output": {
+            "model": "gpt-4o-mini",
+            "content": "Hi Ada, just checking in on the proposal I sent last week.",
+            "finish_reason": "stop",
+            "tool_calls": null,
+            "usage": { "input_tokens": 14, "output_tokens": 16, "cached_input_tokens": 0 }
+          },
+          "error": null,
+          "error_code": null,
+          "error_message": null,
+          "cost": { "estimated": "0.00061560", "actual": null },
+          "cache": { "hit": false, "cached_at": null },
+          "replayed": false,
+          "waiting_on": null,
+          "trace_url": "/v1/executions/74438200973594720"
+        }
+      }
+    },
+    {
+      "status": 200,
+      "body": {
+        "data": {
+          "execution_id": "74438200973594720",
+          "status": "completed",
+          "operation": "generate_email",
+          "output": {
+            "model": "gpt-4o-mini",
+            "content": "Hi Ada, just checking in on the proposal I sent last week.",
+            "finish_reason": "stop",
+            "tool_calls": null,
+            "usage": { "input_tokens": 14, "output_tokens": 16, "cached_input_tokens": 0 }
+          },
+          "error": null,
+          "error_code": null,
+          "error_message": null,
+          "cost": { "estimated": "0.00061560", "actual": "0.00001170" },
+          "cache": { "hit": false, "cached_at": null },
+          "replayed": true,
+          "waiting_on": null,
+          "trace_url": "/v1/executions/74438200973594720"
+        }
+      }
+    },
+    {
+      "status": 409,
+      "body": {
+        "error": {
+          "code": "idempotency_conflict",
+          "message": "The Idempotency-Key was already used with a different request body",
+          "request_id": "6b2e9c4a-1d7f-4e3b-8a5c-0f9d2e7b4c61"
+        }
+      }
+    }
+  ]
+}

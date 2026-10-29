@@ -1,0 +1,40 @@
+{
+  "calls": [
+    { "method": "PUT", "path": "/v1/customers/user_8421", "body": {} },
+    {
+      "method": "POST",
+      "path": "/v1/customers/user_8421/topup",
+      "headers": { "Idempotency-Key": "invoice-7781:topup" },
+      "body": { "credits": "100.0000", "credit_type": "default", "note": "Invoice 7781" }
+    },
+    { "method": "GET", "path": "/v1/customers/user_8421" },
+    {
+      "method": "POST",
+      "path": "/v1/customers/user_8421/charge",
+      "headers": { "Idempotency-Key": "export-991:charge" },
+      "body": { "credits": "5.0000", "credit_type": "default", "note": "PDF export" }
+    },
+    { "method": "GET", "path": "/v1/customers/user_8421/entries", "query": { "limit": "2" } },
+    {
+      "method": "POST",
+      "path": "/v1/operations/execute",
+      "headers": { "Idempotency-Key": "order-45:email" },
+      "body": {
+        "operation": "generate_email",
+        "input": { "messages": [{ "role": "user", "content": "Write a short follow-up email." }] },
+        "context": { "user_id": "user_9310" }
+      }
+    },
+    { "method": "POST", "path": "/v1/customers/user_8421/block", "body": { "reason": "chargeback" } }
+  ],
+  "prints": [
+    "user_8421 active",
+    "100.0000",
+    "default 100.0000",
+    "95.0000",
+    "charge -5.0000 PDF export",
+    "topup 100.0000 Invoice 7781",
+    "insufficient_credits",
+    "blocked chargeback"
+  ]
+}

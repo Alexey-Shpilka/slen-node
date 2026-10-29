@@ -1,0 +1,34 @@
+{
+  "id": "configure",
+  "status": "ready",
+  "summary": "An SDK built with options of its own — a longer timeout, a shorter connect timeout, more retries, a logger — and one run through a flow; in Node.js the key comes from SLEN_API_KEY.",
+  "languages": ["node", "php"],
+  "regions": ["client", "call"],
+  "responses": [
+    {
+      "status": 200,
+      "body": {
+        "data": {
+          "execution_id": "74438200973594700",
+          "status": "completed",
+          "operation": "generate_email",
+          "output": {
+            "model": "gpt-4o",
+            "content": "Hi Ada, just checking in on the proposal I sent last week.",
+            "finish_reason": "stop",
+            "tool_calls": null,
+            "usage": { "input_tokens": 14, "output_tokens": 16, "cached_input_tokens": 0 }
+          },
+          "error": null,
+          "error_code": null,
+          "error_message": null,
+          "cost": { "estimated": "0.00412500", "actual": null },
+          "cache": { "hit": false, "cached_at": null },
+          "replayed": false,
+          "waiting_on": null,
+          "trace_url": "/v1/executions/74438200973594700"
+        }
+      }
+    }
+  ]
+}

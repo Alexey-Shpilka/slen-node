@@ -1,0 +1,62 @@
+{
+  "id": "wait",
+  "status": "ready",
+  "summary": "An async run: submit it, get `queued` back at once, wait for the end with wait(); one status read is rate-limited on the way, which the wait rides out and reports to onPollError.",
+  "languages": ["node", "php"],
+  "regions": ["client", "submit", "wait", "result"],
+  "responses": [
+    {
+      "status": 202,
+      "body": {
+        "data": {
+          "execution_id": "74438200973594800",
+          "status": "queued",
+          "operation": "summarize_report",
+          "output": null,
+          "error": null,
+          "error_code": null,
+          "error_message": null,
+          "cost": { "estimated": null, "actual": null },
+          "cache": { "hit": false, "cached_at": null },
+          "replayed": false,
+          "waiting_on": null,
+          "trace_url": "/v1/executions/74438200973594800",
+          "retry_after_seconds": 2
+        }
+      }
+    },
+    {
+      "status": 429,
+      "body": {
+        "error": {
+          "code": "rate_limit_exceeded",
+          "message": "API rate limit exceeded",
+          "request_id": "0d3c1b9e-5a47-4f0e-9a36-2f6c8d1e7b42"
+        }
+      }
+    },
+    {
+      "status": 200,
+      "body": {
+        "data": {
+          "execution_id": "74438200973594800",
+          "status": "completed",
+          "operation": "summarize_report",
+          "output": {
+            "model": "gpt-4o",
+            "content": "Revenue grew 12% quarter over quarter; churn held at 2.1%.",
+            "finish_reason": "stop",
+            "tool_calls": null,
+            "usage": { "input_tokens": 1840, "output_tokens": 22, "cached_input_tokens": 0 }
+          },
+          "error_code": null,
+          "error_message": null,
+          "cost": { "estimated": "0.01480000", "actual": null },
+          "cache": { "hit": false, "cached_at": null },
+          "waiting_on": null,
+          "trace_url": "/v1/executions/74438200973594800"
+        }
+      }
+    }
+  ]
+}
