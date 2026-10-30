@@ -183,8 +183,11 @@ describe('the caller\'s own request id', () => {
     const error = await outcome(slen.customers.get('user_8421', { requestId: requestId as string }));
 
     expect(error).toBeInstanceOf(InvalidRequestError);
-    expect(error).toMatchObject({ code: 'invalid_request', status: null });
-    expect((error as Error).message).toContain('requestId');
+    expect(error).toMatchObject({
+      code: 'invalid_request',
+      status: null,
+      message: 'Slen: the request id of GET /v1/customers/{externalUserId} must be 8 to 128 of A-Z, a-z, 0-9, ".", "_", ":" and "-".',
+    });
     expect(http.requests).toEqual([]);
     expect(records).toEqual([]);
   });

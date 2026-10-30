@@ -15,7 +15,7 @@ All notable changes to `@slen/sdk` are written here. The format follows [Keep a 
 ### Added
 - `customers.listAll(options)` and `customers.entriesAll(externalUserId, options)`: every customer and every entry of a statement, page after page, as async generators. A page is asked for when the loop reaches it; `cursor` is where it starts, `limit` the size of a page, `timeoutMs`, `retries` and `signal` hold for each page.
 - `_request_id` on the answer of every call that reads one: the `X-Request-Id` of the response, not enumerable, so `JSON.stringify` and a spread leave it out. `executions.wait()` gives the id of its last read.
-- `requestId` in the options of every call: your own id of the request, sent as `X-Request-Id` on each attempt and kept by the API; 8 to 128 of `A-Z a-z 0-9 . _ : -`, anything else refused before the wire. Not taken by `listAll()`, `entriesAll()` or `executions.wait()`, which make more than one request.
+- `requestId` in the options of every call: your own id of the request, sent as `X-Request-Id` on each attempt and kept by the API; 8 to 128 of `A-Z a-z 0-9 . _ : -`, anything else refused before the wire. Not taken by `listAll()`, `entriesAll()` or `executions.wait()`, which make more than one request; the loops refuse one at the call.
 - The types `WithRequestId<T>` and `CreditPriceList`.
 
 ## [0.3.1] - 2026-10-30

@@ -266,7 +266,7 @@ export function refuseBeforeTheWire(request: ApiRequest): void {
 
   if (request.requestId !== undefined && !(typeof request.requestId === 'string' && REQUEST_ID.test(request.requestId))) {
     throw new InvalidRequestError(
-      `Slen: the requestId of ${request.method} ${request.route} must be 8 to 128 of A-Z a-z 0-9 . _ : -, as 'order-42:charge' is.`,
+      `Slen: the request id of ${request.method} ${request.route} must be 8 to 128 of A-Z, a-z, 0-9, ".", "_", ":" and "-".`,
       { code: INVALID_REQUEST },
     );
   }

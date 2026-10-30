@@ -423,18 +423,44 @@ describe('customers.listAll() and entriesAll()', () => {
   });
 
   it.each([
-    ['listAll', (customers: Modules['customers']): AsyncIterable<unknown> => customers.listAll({ requestId: 'order-42:customers' })],
-    ['entriesAll', (customers: Modules['customers']): AsyncIterable<unknown> => customers.entriesAll('user_8421', { requestId: 'order-42:entries' })],
-  ] as const)('%s refuses a requestId of its own before the wire: one id names one request', async (_, loop) => {
+    [
+      'listAll',
+      'GET /v1/customers',
+      (customers: Modules['customers']): AsyncIterable<unknown> => customers.listAll({ requestId: 'order-42:customers' }),
+    ],
+    [
+      'entriesAll',
+      'GET /v1/customers/{externalUserId}/entries',
+      (customers: Modules['customers']): AsyncIterable<unknown> => customers.entriesAll('user_8421', { requestId: 'order-42:entries' }),
+    ],
+  ] as const)('%s refuses a requestId of its own at the call, as PHP does: one id names one request', (_, operation, loop) => {
     const { customers, http, records } = modules();
+    let refused: unknown = null;
 
-    const { rows, error } = await drain(loop(customers));
+    try {
+      loop(customers);
+    } catch (error) {
+      refused = error;
+    }
+
+    expect(refused).toBeInstanceOf(InvalidRequestError);
+    expect(refused).toMatchObject({
+      code: 'invalid_request',
+      message: `Slen: a request id names one request, and each page of ${operation} is one; give it to a call of one page.`,
+    });
+    expect(http.requests).toEqual([]);
+    expect(records).toEqual([]);
+  });
+
+  it('checks the other options of a page when the loop reads it, as a call of one page does', async () => {
+    const { customers, http } = modules();
+    const loop = customers.listAll({ retries: -1 });
+
+    const { rows, error } = await drain(loop);
 
     expect(rows).toEqual([]);
     expect(error).toBeInstanceOf(InvalidRequestError);
-    expect(error).toMatchObject({ code: 'invalid_request' });
     expect(http.requests).toEqual([]);
-    expect(records).toEqual([]);
   });
 
   it('gives the retries of the options to each page', async () => {

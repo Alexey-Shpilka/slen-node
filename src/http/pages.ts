@@ -8,19 +8,22 @@ export interface PagedList {
   readonly options: RequestOptions & { readonly cursor?: string };
 }
 
-/** @internal @throws SlenError */
-export async function* rowsOf<T>(
-  list: PagedList,
-  read: (cursor: string | undefined) => Promise<WithRequestId<Page<T>>>,
-): AsyncGenerator<T, void, undefined> {
-  const { operation, options } = list;
+type PageReader<T> = (cursor: string | undefined) => Promise<WithRequestId<Page<T>>>;
 
-  if (options.requestId !== undefined) {
-    throw new InvalidRequestError(`Slen: ${operation} is read page after page, and one requestId names one request; leave it out of the options.`, {
-      code: INVALID_REQUEST,
-    });
+/** @internal @throws InvalidRequestError at the call, with nothing sent */
+export function rowsOf<T>(list: PagedList, read: PageReader<T>): AsyncGenerator<T, void, undefined> {
+  if (list.options.requestId !== undefined) {
+    throw new InvalidRequestError(
+      `Slen: a request id names one request, and each page of ${list.operation} is one; give it to a call of one page.`,
+      { code: INVALID_REQUEST },
+    );
   }
 
+  return pagesOf(list, read);
+}
+
+async function* pagesOf<T>(list: PagedList, read: PageReader<T>): AsyncGenerator<T, void, undefined> {
+  const { operation, options } = list;
   let cursor = options.cursor;
 
   for (;;) {
