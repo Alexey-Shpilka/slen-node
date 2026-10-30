@@ -42,7 +42,7 @@ describe('a generated key', () => {
     const platform = globalThis.crypto;
 
     vi.stubGlobal('crypto', {
-      getRandomValues: (array: Uint8Array): Uint8Array => platform.getRandomValues(array),
+      getRandomValues: (array: Uint8Array<ArrayBuffer>): Uint8Array<ArrayBuffer> => platform.getRandomValues(array),
     });
 
     const first = generateIdempotencyKey();

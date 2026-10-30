@@ -19,6 +19,7 @@ npm install @slen/sdk
 | Node.js | 20.3 and newer | the suite on Node 22; the built package run on exactly 20.3.0 (`scripts/floor.mjs`) |
 | Modules | ESM and CommonJS | both builds ship in `dist/` and are loaded by the floor |
 | OpenTelemetry | `@opentelemetry/api` 1.7 and newer, optional | only `otelSpanRecorder()` needs it |
+| TypeScript | 5.0 and newer, 7 included | the examples of the docs compiled against the packed types on 5.0 and on 7, with Node's resolution and a bundler's (`scripts/consumer.mjs`) |
 
 ## The client
 

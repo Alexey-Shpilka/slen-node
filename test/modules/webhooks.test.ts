@@ -28,7 +28,7 @@ interface Vector {
   event: { id: string; type: string } | null;
 }
 
-/** Signed by the backend's own `WebhookSigner::sign()`; the PHP suite checks the same file. */
+/** Signed by the Slen backend's own webhook signer; the PHP suite checks the same file. */
 const VECTORS = JSON.parse(readFileSync(new URL('webhook-vectors.json', CONTRACT), 'utf8')) as {
   secret: string;
   tolerance_seconds: number;
