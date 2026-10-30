@@ -45,7 +45,7 @@ async function* pagesOf<T>(list: PagedList, read: PageReader<T>): AsyncGenerator
 
     // The same cursor again would be the same page again, for ever.
     if (next === cursor) {
-      throw new InvalidResponseError(`Slen answered ${operation} with the cursor it was sent; the rows after it cannot be read.`, {
+      throw new InvalidResponseError(`Slen answered a page of ${operation} with the cursor it was asked for; reading on would read the same page forever.`, {
         code: INVALID_RESPONSE,
         status: 200,
         requestId: page._request_id,

@@ -418,7 +418,12 @@ describe('customers.listAll() and entriesAll()', () => {
 
     expect(rows.map((row) => row.entry_id)).toEqual(['1', '2']);
     expect(error).toBeInstanceOf(InvalidResponseError);
-    expect(error).toMatchObject({ code: 'invalid_response', requestId: 'req-again' });
+    expect(error).toMatchObject({
+      code: 'invalid_response',
+      requestId: 'req-again',
+      message:
+        'Slen answered a page of GET /v1/customers/{externalUserId}/entries with the cursor it was asked for; reading on would read the same page forever.',
+    });
     expect(http.requests).toHaveLength(2);
   });
 

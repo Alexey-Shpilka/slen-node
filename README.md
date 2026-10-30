@@ -221,11 +221,11 @@ console.log(customer._request_id);
 
 It is not a field of the body: `JSON.stringify`, a spread and `Object.keys` leave it out, and the rows of a page and what an answer holds (the accounts of a customer) have none. `executions.wait()` gives the id of its last read; `delete()` answers nothing. An error carries it as `requestId`.
 
-**Your own id.** `requestId` in the options of a call sends your id as `X-Request-Id`, the same on every attempt of the call; the API keeps it, so its log lines, the `request_id` of the journal and the `requestId` of an error carry your id. It is 8 to 128 of `A-Z a-z 0-9 . _ : -` (`'order-42:charge'`); anything else is an `InvalidRequestError` before the wire, since the API would replace it. One id names one request, so `listAll()`, `entriesAll()` and `executions.wait()` take none: the loops throw `InvalidRequestError` at the call when given one.
+**Your own id.** `requestId` in the options of a call sends your id as `X-Request-Id`, the same on every attempt of the call; the API keeps it, so its log lines, the `request_id` of the journal and the `requestId` of an error carry your id — a call that got no answer at all (`ConnectionError`, `TimeoutError`) throws with your id too, while an answer that brings another id has the last word. An aborted call rejects with the signal's own reason, which carries none. It is 8 to 128 of `A-Z a-z 0-9 . _ : -` (`'order-42:charge'`); anything else is an `InvalidRequestError` before the wire, since the API would replace it. One id names one request, so `listAll()`, `entriesAll()` and `executions.wait()` take none: the loops throw `InvalidRequestError` at the call when given one.
 
 ## Errors
 
-Every failure is a `SlenError` with `code`, `status`, `details`, `requestId` (what support finds the request by — the `X-Request-Id` of the answer, else `error.request_id` of its body) and `retryAfterSeconds`. The code decides the type; a code this version has no name for falls back by status:
+Every failure is a `SlenError` with `code`, `status`, `details`, `requestId` (what support finds the request by — the `X-Request-Id` of the answer, else `error.request_id` of its body; with no answer, the call's own `requestId`) and `retryAfterSeconds`. The code decides the type; a code this version has no name for falls back by status:
 
 | Error | Codes | Fallback |
 |---|---|---|

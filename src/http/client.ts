@@ -156,10 +156,11 @@ export class FetchClient implements HttpClient {
       }
 
       const where = `${request.method} ${request.route}`;
+      const sent = { requestId: request.requestId ?? null };
 
       throw clock.expired
-        ? new TimeoutError(`Slen did not answer ${where} within ${timeoutMs} ms.`)
-        : new ConnectionError(`Slen could not be reached for ${where}: ${describe(error)}`);
+        ? new TimeoutError(`Slen did not answer ${where} within ${timeoutMs} ms.`, sent)
+        : new ConnectionError(`Slen could not be reached for ${where}: ${describe(error)}`, sent);
     } finally {
       clock.stop();
     }

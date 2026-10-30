@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { InvalidRequestError, ServiceUnavailableError } from '../../src/errors.js';
+import { ConnectionError, InvalidRequestError, ServiceUnavailableError, TimeoutError } from '../../src/errors.js';
 import type { RequestOptions, WaitOptions } from '../../src/index.js';
 import { Slen } from '../../src/slen.js';
 import { FakeFetch, type QueuedResponse } from '../../src/testing/index.js';
@@ -146,6 +146,46 @@ describe('the caller\'s own request id', () => {
 
     expect(error).toBeInstanceOf(ServiceUnavailableError);
     expect(error).toMatchObject({ requestId: 'order-42:get' });
+  });
+
+  it('is the id of an answer that brings another one: the answer wins', async () => {
+    const { slen } = client({ status: 404, headers: { 'X-Request-Id': 'req-of-the-server' }, body: { error: { code: 'customer_not_found' } } });
+
+    expect(await outcome(slen.customers.get('user_8421', { requestId: 'order-42:get' }))).toMatchObject({ requestId: 'req-of-the-server' });
+  });
+
+  it.each([
+    ['a TimeoutError', TimeoutError, { delayMs: 1_000, body: HEALTH }],
+    ['a ConnectionError', ConnectionError, null],
+  ] as const)('is carried by %s of a call that got no answer; without one of its own the error has none', async (_, type, answer) => {
+    const failing = (async () => {
+      throw new TypeError('fetch failed');
+    }) as unknown as typeof fetch;
+    const http = new FakeFetch();
+
+    if (answer !== null) {
+      http.push(answer);
+    }
+
+    const slen = new Slen({ apiKey: 'sl_live_key', fetch: answer === null ? failing : http.fetch, timeoutMs: 20, retries: 1 });
+    const own = await outcome(slen.customers.get('user_8421', { requestId: 'order-42:lost', retries: 0 }));
+    const none = await outcome(slen.customers.get('user_8421', { retries: 0 }));
+
+    expect(own).toBeInstanceOf(type);
+    expect(own).toMatchObject({ code: null, status: null, requestId: 'order-42:lost' });
+    expect(none).toBeInstanceOf(type);
+    expect(none).toMatchObject({ requestId: null });
+  });
+
+  it('leaves an abort as the signal\'s own reason: it is the caller\'s, not an error of the SDK', async () => {
+    const caller = new AbortController();
+    const reason = new Error('the caller went away');
+    const { slen } = client({ delayMs: 1_000, body: HEALTH });
+
+    const pending = outcome(slen.health({ requestId: 'order-42:health', signal: caller.signal }));
+    caller.abort(reason);
+
+    expect(await pending).toBe(reason);
   });
 
   it('replaces an X-Request-Id the client sends with every request, for this call only', async () => {
