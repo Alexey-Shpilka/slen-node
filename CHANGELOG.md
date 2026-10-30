@@ -4,6 +4,8 @@ All notable changes to `@slen/sdk` are written here. The format follows [Keep a 
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-31
+
 ### Breaking
 - `customers.prices()` answers a `CreditPriceList` — `{ data: CreditPrice[] }`, the body of `GET /v1/credit-prices` — instead of the bare list, so the answer has a place for the id of its response; read the rows as `prices.data`. The PHP SDK answers the same object.
 - Every call that reads an answer returns `Promise<WithRequestId<T>>`, the answer typed as before with `_request_id` beside it. Code that names the result `Customer`, `Page<Customer>` or another wire type keeps compiling; code that declared `Promise<Customer>` for a function returning a call's result keeps compiling too.
@@ -41,6 +43,7 @@ No change of the API or of behaviour.
 
 The first tag; not published.
 
-[Unreleased]: https://github.com/Alexey-Shpilka/slen-node/compare/v0.3.1...HEAD
+[Unreleased]: https://github.com/Alexey-Shpilka/slen-node/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/Alexey-Shpilka/slen-node/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/Alexey-Shpilka/slen-node/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/Alexey-Shpilka/slen-node/releases/tag/v0.3.0
