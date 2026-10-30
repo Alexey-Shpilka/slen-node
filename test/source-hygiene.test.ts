@@ -40,10 +40,14 @@ const INTERNAL: ReadonlyArray<readonly [RegExp, string]> = [
   [/sn[o]vio|sp[e]ndguard|l[i]mly/i, 'an earlier name'],
   [/(?<![\p{L}\p{N}_])[НРПЗВФХ](?:-\d|\d+\.\d)/iu, 'a number of a finding, a decision or a task'],
   [/sl_live_[A-Za-z0-9]{20,}/, 'a key that looks real'],
+  [/(?<![\p{L}\p{N}./])v\d{2,}\//iu, 'a branch of an iteration'],
+  [/_v\d+_/i, 'the number of an iteration in a name'],
+  [/\b(?:since|until) v\d{2,}(?![.\d])/i, 'the number of an iteration'],
+  [/\b(?:backend|frontend|infra|sdk|master|main)[ @:#][0-9a-f]{7,40}\b/i, 'a branch pinned to a commit'],
 ];
 
-/** What the package's tools leave in it and a public tree never gets. */
-const LEFT_BEHIND: readonly string[] = ['node_modules', 'dist'];
+/** What the package's tools leave in it and a public tree never gets; and git's own directory, no file of the package. */
+const LEFT_BEHIND: readonly string[] = ['node_modules', 'dist', '.git'];
 
 function internalIn(text: string): string[] {
   return text.split('\n').flatMap((line, index) => INTERNAL.filter(([pattern]) => pattern.test(line)).map(([, what]) => `${index + 1}: ${what}`));
@@ -437,7 +441,12 @@ describe('the hygiene check itself', () => {
       'fixes \u041D-17',
       'dropped in \u04123.1',
       'sl_live_' + 'x'.repeat(20),
+      'signed on backend v' + '26/backend',
+      'whsec_v' + '26_contract_vectors',
+      'kept until v' + '29',
+      'backend' + ' a72a940',
       'H-1 is not Cyrillic; https://api.test; sl_live_…; docs/configuration; v0.3.0 on Node 20.3, 1.2.3',
+      't=1792238400,v1=d90c1b78be2a0b86, v0=deadbeef; GET /v1/customers; since v1.2; whsec_contract_vectors_7f3a91c2',
     ].join('\n');
 
     expect(internalIn(text)).toEqual([
@@ -451,6 +460,10 @@ describe('the hygiene check itself', () => {
       '8: a number of a finding, a decision or a task',
       '9: a number of a finding, a decision or a task',
       '10: a key that looks real',
+      '11: a branch of an iteration',
+      '12: the number of an iteration in a name',
+      '13: the number of an iteration',
+      '14: a branch pinned to a commit',
     ]);
   });
 
@@ -465,7 +478,7 @@ describe('the hygiene check itself', () => {
     expect(findingsOf('// dropped in \u04123.1\n').map((finding) => finding.problem)).toEqual(['a number of a finding, decision, package or task']);
     expect(findingsOf('// as of 0.3.0, on Node 20.3\n')).toEqual([]);
     expect(findingsOf('// this used to retry\n').map((finding) => finding.problem)).toEqual(['"used to"']);
-    expect(findingsOf('// kept until v29\n// added since v24\n').map((finding) => finding.problem)).toEqual(['"until vNN"', '"since vNN"']);
+    expect(findingsOf('// kept until \u{76}29\n// added since \u{76}24\n').map((finding) => finding.problem)).toEqual(['"until vNN"', '"since vNN"']);
     expect(findingsOf('// a P-3 in Latin letters is not a plan number\n')).toEqual([]);
   });
 });
