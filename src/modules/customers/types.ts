@@ -58,6 +58,11 @@ export interface CreditEntry {
   created_at: string;
 }
 
+/** The price list of the project, as `GET /v1/credit-prices` answers it: a handful of rows, so no cursor. */
+export interface CreditPriceList {
+  data: CreditPrice[];
+}
+
 /** What one run of an operation holds from its customer, in credits of one type. */
 export interface CreditPrice {
   credit_price_id: Id;

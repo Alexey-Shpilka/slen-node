@@ -3,6 +3,7 @@ import { type ApiRequest, type CallOptions, refuseBeforeTheWire, transportOf } f
 import { endpoint, ENDPOINTS } from '../../http/endpoints.js';
 import { generateIdempotencyKey } from '../../idempotency.js';
 import { SpanScope } from '../../observability/scope.js';
+import type { WithRequestId } from '../../wire.js';
 import type { ModuleContext } from '../context.js';
 import type { ExecutionResult } from './types.js';
 
@@ -36,16 +37,16 @@ export class OperationsModule {
   }
 
   /** Runs the flow inside the request and answers with the run; a repeated key answers the first run. @throws SlenError */
-  execute(operation: string, input: Record<string, unknown>, options: ExecuteOptions = {}): Promise<ExecutionResult> {
+  execute(operation: string, input: Record<string, unknown>, options: ExecuteOptions = {}): Promise<WithRequestId<ExecutionResult>> {
     return this.#run({ operation, input, queued: false }, options);
   }
 
   /** Hands the run to a worker and answers `queued` at once; `executions.wait()` or a webhook tells the rest. @throws SlenError */
-  executeAsync(operation: string, input: Record<string, unknown>, options: ExecuteOptions = {}): Promise<ExecutionResult> {
+  executeAsync(operation: string, input: Record<string, unknown>, options: ExecuteOptions = {}): Promise<WithRequestId<ExecutionResult>> {
     return this.#run({ operation, input, queued: true }, options);
   }
 
-  async #run(order: RunOrder, options: ExecuteOptions): Promise<ExecutionResult> {
+  async #run(order: RunOrder, options: ExecuteOptions): Promise<WithRequestId<ExecutionResult>> {
     const request: ApiRequest = {
       ...endpoint(ENDPOINTS.execute),
       body: bodyOf(order, options),

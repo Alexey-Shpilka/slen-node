@@ -3,6 +3,7 @@ import * as sdk from '../src/index.js';
 import type {
   AccountOptions,
   CallOptions,
+  CreditPriceList,
   Customer,
   CustomerListOptions,
   EntryListOptions,
@@ -12,6 +13,7 @@ import type {
   RequestOptions,
   VerifyOptions,
   WebhookEvent,
+  WithRequestId,
 } from '../src/index.js';
 
 /**
@@ -128,6 +130,14 @@ describe('the public surface of @slen/sdk', () => {
     expect([options.idempotencyKey, frame, shapes]).toEqual(['k', null, []]);
     expect(sdk.INVALID_RESPONSE).toBe('invalid_response');
     expect(sdk.webhooks).toBeInstanceOf(sdk.WebhooksModule);
+  });
+
+  it('exports the answer with the id of its response and the price list a caller names', () => {
+    const answer: WithRequestId<Customer> | null = null;
+    const prices: CreditPriceList = { data: [] };
+    const options: RequestOptions = { requestId: 'order-42:get' };
+
+    expect([answer, prices.data, options.requestId]).toEqual([null, [], 'order-42:get']);
   });
 
   it('names the options of a call as the PHP SDK names its classes, and keeps no earlier name', () => {

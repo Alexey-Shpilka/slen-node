@@ -41,7 +41,7 @@ The key is the project's API key; left out, it is read from `SLEN_API_KEY`, and 
 | `webhookSecret`, `webhookToleranceSeconds` | none, `300` | for checking webhooks — below |
 | `fetch`, `headers` | the runtime's `fetch`, none | the SDK's own headers win over yours |
 
-**How a call is written.** What names the thing is positional — an operation, an external user id, an amount of credits — and everything else is one object of options in camelCase. Every call that goes to the API also takes `signal` (aborting it ends the call with the signal's reason), `timeoutMs` (a clock for each attempt of that call in place of the client's) and `retries` (how often that call is sent again, in place of the client's; `0` sends it once); a call that sends a body takes `idempotencyKey`. `executions.wait()` takes `signal` and a `timeoutSeconds` of its own, and gives each of its reads what is left of it. The options are named as the PHP SDK names its classes: `RequestOptions`, `ExecuteOptions`, `WaitOptions`, `CustomerListOptions`, `AccountOptions`, `BlockOptions`, `MovementOptions`, `EntryListOptions`, `PriceListOptions`, `VerifyOptions`, `WebhooksOptions`.
+**How a call is written.** What names the thing is positional — an operation, an external user id, an amount of credits — and everything else is one object of options in camelCase. Every call that goes to the API also takes `signal` (aborting it ends the call with the signal's reason), `timeoutMs` (a clock for each attempt of that call in place of the client's), `retries` (how often that call is sent again, in place of the client's; `0` sends it once) and `requestId` (your own id of the request — below); a call that sends a body takes `idempotencyKey`. `executions.wait()` takes `signal` and a `timeoutSeconds` of its own, and gives each of its reads what is left of it. The options are named as the PHP SDK names its classes: `RequestOptions`, `ExecuteOptions`, `WaitOptions`, `CustomerListOptions`, `AccountOptions`, `BlockOptions`, `MovementOptions`, `EntryListOptions`, `PriceListOptions`, `VerifyOptions`, `WebhooksOptions`.
 
 ## Run a flow
 
@@ -103,16 +103,28 @@ const account = await slen.customers.charge('user_8421', '5.0000', { note: 'PDF 
 | Call | What it does |
 |---|---|
 | `list({ cursor, limit, search, status, creditType, lowBalance })` | customers with their accounts, a page at a time (`data`, `meta.next_cursor`) |
+| `listAll({ cursor, limit, … })` | every customer `list()` reads, page after page — below |
 | `get(id)`, `create(id)` | one customer with every account; `create()` is idempotent and moves no credits |
 | `updateAccount(id, creditType, { allowNegative, lowBalanceThreshold })` | the settings of one account; what is left out goes back to `false` and `'0'` |
 | `block(id, { reason })`, `unblock(id)` | a blocked customer's new runs are refused (`CustomerBlockedError`); their balance can still be settled |
 | `delete(id)` | a customer with no history; one with history is refused (409) — block them instead |
 | `topUp(id, credits, options)`, `charge(id, credits, options)` | add credits; take them for a service of your own application. Above zero |
 | `adjust(id, credits, options)` | an operator's correction, with a sign; not zero |
-| `entries(id, { cursor, limit, creditType, entryType })` | the statement of the customer's accounts |
-| `prices({ operationCode, creditType })` | what an operation costs in credits |
+| `entries(id, { cursor, limit, creditType, entryType })` | the statement of the customer's accounts, a page at a time |
+| `entriesAll(id, { cursor, limit, … })` | every entry of the statement, page after page |
+| `prices({ operationCode, creditType })` | what an operation costs in credits: `{ data }`, a handful of rows, no cursor |
 
 Credits are a decimal string of at most four places (`'5'`, `'5.25'`, `'-3.0000'`); anything else is refused before the wire. A movement takes `creditType` (default `'default'`), `note` and `idempotencyKey`; under the same key the server moves the credits once.
+
+**Every page.** `listAll()` and `entriesAll()` are async generators over `list()` and `entries()`:
+
+```ts
+for await (const entry of slen.customers.entriesAll('user_8421', { limit: 100 })) {
+  console.log(entry.entry_type, entry.credits);
+}
+```
+
+Nothing is sent until the loop asks for the first row; each page is one request, sent when the loop reaches it, so a `break` sends nothing more. `cursor` is where the loop starts, `limit` the size of a page (1 to 100, 50 by default), and `timeoutMs`, `retries` and `signal` hold for each page. When the rows end exactly at the end of a page, the loop reads one empty page to find out — the API's cursor works that way. A cursor that comes back as it was sent is an `InvalidResponseError`, not an endless loop. To pick up later where you stopped, keep `meta.next_cursor` of a page from `list()` or `entries()` and pass it as `cursor`.
 
 ## Webhooks
 
@@ -197,9 +209,23 @@ const run = await slen.withLogger(requestLogger).operations.execute('support.rep
 - **One client per API key**, built where the key is known; no cache of clients in module scope keyed by it.
 - **`FakeFetch` and `MemorySpanRecorder` keep everything** they are given: they are for tests, never for a server.
 
+## Request ids
+
+Every answer of the API carries the id of its request, the one its log lines and support find it by. Every call that reads an answer gives it to you as `_request_id` (a `WithRequestId<T>`), read from the `X-Request-Id` header; `null` when the answer had none:
+
+```ts
+const customer = await slen.customers.get('user_8421');
+
+console.log(customer._request_id);
+```
+
+It is not a field of the body: `JSON.stringify`, a spread and `Object.keys` leave it out, and the rows of a page and what an answer holds (the accounts of a customer) have none. `executions.wait()` gives the id of its last read; `delete()` answers nothing. An error carries it as `requestId`.
+
+**Your own id.** `requestId` in the options of a call sends your id as `X-Request-Id`, the same on every attempt of the call; the API keeps it, so its log lines, the `request_id` of the journal and the `requestId` of an error carry your id. It is 8 to 128 of `A-Z a-z 0-9 . _ : -` (`'order-42:charge'`); anything else is an `InvalidRequestError` before the wire, since the API would replace it. One id names one request, so `listAll()`, `entriesAll()` and `executions.wait()` take none.
+
 ## Errors
 
-Every failure is a `SlenError` with `code`, `status`, `details`, `requestId` (what support finds the request by) and `retryAfterSeconds`. The code decides the type; a code this version has no name for falls back by status:
+Every failure is a `SlenError` with `code`, `status`, `details`, `requestId` (what support finds the request by — the `X-Request-Id` of the answer, else `error.request_id` of its body) and `retryAfterSeconds`. The code decides the type; a code this version has no name for falls back by status:
 
 | Error | Codes | Fallback |
 |---|---|---|

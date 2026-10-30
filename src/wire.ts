@@ -20,3 +20,6 @@ export interface Page<T> {
   data: T[];
   meta: CursorMeta;
 }
+
+/** An answer with the id of its response (`X-Request-Id`): not a field of the body, so a spread or `JSON.stringify` leaves it out. */
+export type WithRequestId<T> = T & { readonly _request_id: string | null };

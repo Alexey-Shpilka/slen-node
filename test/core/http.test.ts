@@ -153,11 +153,22 @@ describe('the answer', () => {
     expect(await api.request({ method: 'GET', route: '/health', envelope: false })).toEqual({ app: 'slen', mysql: 'ok' });
   });
 
-  it('is nothing for a 204', async () => {
+  it('is nothing for a 204 of a call that answers no body', async () => {
     const { api, http } = chain();
     http.push({ status: 204 });
 
-    expect(await api.request({ method: 'DELETE', route: '/v1/customers/{externalUserId}', params: { externalUserId: 'user_1' } })).toBeUndefined();
+    expect(await api.requestNoContent({ method: 'DELETE', route: '/v1/customers/{externalUserId}', params: { externalUserId: 'user_1' } })).toBeUndefined();
+  });
+
+  it('of a call that reads an answer is an InvalidResponseError for a 204: there is nothing to read', async () => {
+    const { api, http } = chain();
+    http.push({ status: 204, headers: { 'X-Request-Id': 'req-204' } });
+
+    const error = await outcome(api.request(CUSTOMER));
+
+    expect(error).toBeInstanceOf(InvalidResponseError);
+    expect(error).toMatchObject({ code: 'invalid_response', status: 204, requestId: 'req-204' });
+    expect((error as Error).message).toContain('no body');
   });
 
   it.each([
@@ -194,9 +205,16 @@ describe('the answer', () => {
     expect(error).toMatchObject({ code: 'budget_exceeded', status: 402, requestId: 'req-402', details: { budget_id: '9' }, message: 'Over budget' });
   });
 
-  it('of a refusal takes the request id of the body before the header', async () => {
+  it('of a refusal takes the request id of the header, the one every answer carries, before the body', async () => {
     const { api, http } = chain();
     http.push({ status: 404, headers: { 'X-Request-Id': 'req-header' }, body: { error: { code: 'customer_not_found', request_id: 'req-body' } } });
+
+    expect(await outcome(api.request(CUSTOMER))).toMatchObject({ requestId: 'req-header' });
+  });
+
+  it('of a refusal without the header takes the request id of the body', async () => {
+    const { api, http } = chain();
+    http.push({ status: 404, body: { error: { code: 'customer_not_found', request_id: 'req-body' } } });
 
     expect(await outcome(api.request(CUSTOMER))).toMatchObject({ requestId: 'req-body' });
   });

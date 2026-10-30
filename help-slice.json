@@ -154,7 +154,7 @@
       "member": "adjust",
       "deprecated": false,
       "internal": false,
-      "signature": "adjust(externalUserId: string, credits: string, options?: MovementOptions): Promise<CustomerAccount>",
+      "signature": "adjust(externalUserId: string, credits: string, options?: MovementOptions): Promise<WithRequestId<CustomerAccount>>",
       "operation": "POST /v1/customers/{externalUserId}/adjust"
     },
     {
@@ -163,7 +163,7 @@
       "member": "block",
       "deprecated": false,
       "internal": false,
-      "signature": "block(externalUserId: string, options?: BlockOptions): Promise<Customer>",
+      "signature": "block(externalUserId: string, options?: BlockOptions): Promise<WithRequestId<Customer>>",
       "operation": "POST /v1/customers/{externalUserId}/block"
     },
     {
@@ -172,7 +172,7 @@
       "member": "charge",
       "deprecated": false,
       "internal": false,
-      "signature": "charge(externalUserId: string, credits: string, options?: MovementOptions): Promise<CustomerAccount>",
+      "signature": "charge(externalUserId: string, credits: string, options?: MovementOptions): Promise<WithRequestId<CustomerAccount>>",
       "operation": "POST /v1/customers/{externalUserId}/charge"
     },
     {
@@ -181,7 +181,7 @@
       "member": "create",
       "deprecated": false,
       "internal": false,
-      "signature": "create(externalUserId: string, options?: RequestOptions): Promise<Customer>",
+      "signature": "create(externalUserId: string, options?: RequestOptions): Promise<WithRequestId<Customer>>",
       "operation": "PUT /v1/customers/{externalUserId}"
     },
     {
@@ -199,7 +199,16 @@
       "member": "entries",
       "deprecated": false,
       "internal": false,
-      "signature": "entries(externalUserId: string, options?: EntryListOptions): Promise<Page<CreditEntry>>",
+      "signature": "entries(externalUserId: string, options?: EntryListOptions): Promise<WithRequestId<Page<CreditEntry>>>",
+      "operation": "GET /v1/customers/{externalUserId}/entries"
+    },
+    {
+      "name": "customers.entriesAll",
+      "symbol": "CustomersModule",
+      "member": "entriesAll",
+      "deprecated": false,
+      "internal": false,
+      "signature": "entriesAll(externalUserId: string, options?: EntryListOptions): AsyncGenerator<CreditEntry, void, undefined>",
       "operation": "GET /v1/customers/{externalUserId}/entries"
     },
     {
@@ -208,7 +217,7 @@
       "member": "get",
       "deprecated": false,
       "internal": false,
-      "signature": "get(externalUserId: string, options?: RequestOptions): Promise<Customer>",
+      "signature": "get(externalUserId: string, options?: RequestOptions): Promise<WithRequestId<Customer>>",
       "operation": "GET /v1/customers/{externalUserId}"
     },
     {
@@ -217,7 +226,16 @@
       "member": "list",
       "deprecated": false,
       "internal": false,
-      "signature": "list(options?: CustomerListOptions): Promise<Page<Customer>>",
+      "signature": "list(options?: CustomerListOptions): Promise<WithRequestId<Page<Customer>>>",
+      "operation": "GET /v1/customers"
+    },
+    {
+      "name": "customers.listAll",
+      "symbol": "CustomersModule",
+      "member": "listAll",
+      "deprecated": false,
+      "internal": false,
+      "signature": "listAll(options?: CustomerListOptions): AsyncGenerator<Customer, void, undefined>",
       "operation": "GET /v1/customers"
     },
     {
@@ -226,7 +244,7 @@
       "member": "prices",
       "deprecated": false,
       "internal": false,
-      "signature": "prices(options?: PriceListOptions): Promise<CreditPrice[]>",
+      "signature": "prices(options?: PriceListOptions): Promise<WithRequestId<CreditPriceList>>",
       "operation": "GET /v1/credit-prices"
     },
     {
@@ -235,7 +253,7 @@
       "member": "topUp",
       "deprecated": false,
       "internal": false,
-      "signature": "topUp(externalUserId: string, credits: string, options?: MovementOptions): Promise<CustomerAccount>",
+      "signature": "topUp(externalUserId: string, credits: string, options?: MovementOptions): Promise<WithRequestId<CustomerAccount>>",
       "operation": "POST /v1/customers/{externalUserId}/topup"
     },
     {
@@ -244,7 +262,7 @@
       "member": "unblock",
       "deprecated": false,
       "internal": false,
-      "signature": "unblock(externalUserId: string, options?: RequestOptions): Promise<Customer>",
+      "signature": "unblock(externalUserId: string, options?: RequestOptions): Promise<WithRequestId<Customer>>",
       "operation": "POST /v1/customers/{externalUserId}/unblock"
     },
     {
@@ -253,7 +271,7 @@
       "member": "updateAccount",
       "deprecated": false,
       "internal": false,
-      "signature": "updateAccount(externalUserId: string, creditType: string, options?: AccountOptions): Promise<CustomerAccount>",
+      "signature": "updateAccount(externalUserId: string, creditType: string, options?: AccountOptions): Promise<WithRequestId<CustomerAccount>>",
       "operation": "PUT /v1/customers/{externalUserId}/accounts/{creditType}"
     },
     {
@@ -262,7 +280,7 @@
       "member": "get",
       "deprecated": false,
       "internal": false,
-      "signature": "get(executionId: string, options?: RequestOptions): Promise<ExecutionStatusView>",
+      "signature": "get(executionId: string, options?: RequestOptions): Promise<WithRequestId<ExecutionStatusView>>",
       "operation": "GET /v1/executions/{id}/status"
     },
     {
@@ -271,7 +289,7 @@
       "member": "trace",
       "deprecated": false,
       "internal": false,
-      "signature": "trace(executionId: string, options?: RequestOptions): Promise<ExecutionTrace>",
+      "signature": "trace(executionId: string, options?: RequestOptions): Promise<WithRequestId<ExecutionTrace>>",
       "operation": "GET /v1/executions/{id}"
     },
     {
@@ -280,7 +298,7 @@
       "member": "wait",
       "deprecated": false,
       "internal": false,
-      "signature": "wait(executionId: string, options?: WaitOptions): Promise<ExecutionStatusView>",
+      "signature": "wait(executionId: string, options?: WaitOptions): Promise<WithRequestId<ExecutionStatusView>>",
       "operation": "GET /v1/executions/{id}/status"
     },
     {
@@ -298,7 +316,7 @@
       "member": "health",
       "deprecated": false,
       "internal": false,
-      "signature": "health(options?: RequestOptions): Promise<Health>",
+      "signature": "health(options?: RequestOptions): Promise<WithRequestId<Health>>",
       "operation": "GET /health"
     },
     {
@@ -307,7 +325,7 @@
       "member": "execute",
       "deprecated": false,
       "internal": false,
-      "signature": "execute(operation: string, input: Record<string, unknown>, options?: ExecuteOptions): Promise<ExecutionResult>",
+      "signature": "execute(operation: string, input: Record<string, unknown>, options?: ExecuteOptions): Promise<WithRequestId<ExecutionResult>>",
       "operation": "POST /v1/operations/execute"
     },
     {
@@ -316,7 +334,7 @@
       "member": "executeAsync",
       "deprecated": false,
       "internal": false,
-      "signature": "executeAsync(operation: string, input: Record<string, unknown>, options?: ExecuteOptions): Promise<ExecutionResult>",
+      "signature": "executeAsync(operation: string, input: Record<string, unknown>, options?: ExecuteOptions): Promise<WithRequestId<ExecutionResult>>",
       "operation": "POST /v1/operations/execute"
     },
     {
@@ -1027,6 +1045,30 @@
       ]
     },
     {
+      "name": "CreditPriceList",
+      "kind": "interface",
+      "source": "src/modules/customers/types.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "data",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "data: CreditPrice[]"
+        }
+      ]
+    },
+    {
       "name": "Credits",
       "kind": "type",
       "source": "src/wire.ts",
@@ -1530,7 +1572,16 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "list(options?: CustomerListOptions): Promise<Page<Customer>>"
+          "signature": "list(options?: CustomerListOptions): Promise<WithRequestId<Page<Customer>>>"
+        },
+        {
+          "name": "listAll",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "listAll(options?: CustomerListOptions): AsyncGenerator<Customer, void, undefined>"
         },
         {
           "name": "get",
@@ -1539,7 +1590,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "get(externalUserId: string, options?: RequestOptions): Promise<Customer>"
+          "signature": "get(externalUserId: string, options?: RequestOptions): Promise<WithRequestId<Customer>>"
         },
         {
           "name": "create",
@@ -1548,7 +1599,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "create(externalUserId: string, options?: RequestOptions): Promise<Customer>"
+          "signature": "create(externalUserId: string, options?: RequestOptions): Promise<WithRequestId<Customer>>"
         },
         {
           "name": "updateAccount",
@@ -1557,7 +1608,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "updateAccount(externalUserId: string, creditType: string, options?: AccountOptions): Promise<CustomerAccount>"
+          "signature": "updateAccount(externalUserId: string, creditType: string, options?: AccountOptions): Promise<WithRequestId<CustomerAccount>>"
         },
         {
           "name": "block",
@@ -1566,7 +1617,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "block(externalUserId: string, options?: BlockOptions): Promise<Customer>"
+          "signature": "block(externalUserId: string, options?: BlockOptions): Promise<WithRequestId<Customer>>"
         },
         {
           "name": "unblock",
@@ -1575,7 +1626,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "unblock(externalUserId: string, options?: RequestOptions): Promise<Customer>"
+          "signature": "unblock(externalUserId: string, options?: RequestOptions): Promise<WithRequestId<Customer>>"
         },
         {
           "name": "delete",
@@ -1593,7 +1644,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "topUp(externalUserId: string, credits: string, options?: MovementOptions): Promise<CustomerAccount>"
+          "signature": "topUp(externalUserId: string, credits: string, options?: MovementOptions): Promise<WithRequestId<CustomerAccount>>"
         },
         {
           "name": "charge",
@@ -1602,7 +1653,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "charge(externalUserId: string, credits: string, options?: MovementOptions): Promise<CustomerAccount>"
+          "signature": "charge(externalUserId: string, credits: string, options?: MovementOptions): Promise<WithRequestId<CustomerAccount>>"
         },
         {
           "name": "adjust",
@@ -1611,7 +1662,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "adjust(externalUserId: string, credits: string, options?: MovementOptions): Promise<CustomerAccount>"
+          "signature": "adjust(externalUserId: string, credits: string, options?: MovementOptions): Promise<WithRequestId<CustomerAccount>>"
         },
         {
           "name": "entries",
@@ -1620,7 +1671,16 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "entries(externalUserId: string, options?: EntryListOptions): Promise<Page<CreditEntry>>"
+          "signature": "entries(externalUserId: string, options?: EntryListOptions): Promise<WithRequestId<Page<CreditEntry>>>"
+        },
+        {
+          "name": "entriesAll",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "entriesAll(externalUserId: string, options?: EntryListOptions): AsyncGenerator<CreditEntry, void, undefined>"
         },
         {
           "name": "prices",
@@ -1629,7 +1689,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "prices(options?: PriceListOptions): Promise<CreditPrice[]>"
+          "signature": "prices(options?: PriceListOptions): Promise<WithRequestId<CreditPriceList>>"
         }
       ]
     },
@@ -2332,7 +2392,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "get(executionId: string, options?: RequestOptions): Promise<ExecutionStatusView>"
+          "signature": "get(executionId: string, options?: RequestOptions): Promise<WithRequestId<ExecutionStatusView>>"
         },
         {
           "name": "wait",
@@ -2341,7 +2401,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "wait(executionId: string, options?: WaitOptions): Promise<ExecutionStatusView>"
+          "signature": "wait(executionId: string, options?: WaitOptions): Promise<WithRequestId<ExecutionStatusView>>"
         },
         {
           "name": "trace",
@@ -2350,7 +2410,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "trace(executionId: string, options?: RequestOptions): Promise<ExecutionTrace>"
+          "signature": "trace(executionId: string, options?: RequestOptions): Promise<WithRequestId<ExecutionTrace>>"
         }
       ]
     },
@@ -3130,7 +3190,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "execute(operation: string, input: Record<string, unknown>, options?: ExecuteOptions): Promise<ExecutionResult>"
+          "signature": "execute(operation: string, input: Record<string, unknown>, options?: ExecuteOptions): Promise<WithRequestId<ExecutionResult>>"
         },
         {
           "name": "executeAsync",
@@ -3139,7 +3199,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "executeAsync(operation: string, input: Record<string, unknown>, options?: ExecuteOptions): Promise<ExecutionResult>"
+          "signature": "executeAsync(operation: string, input: Record<string, unknown>, options?: ExecuteOptions): Promise<WithRequestId<ExecutionResult>>"
         }
       ]
     },
@@ -3772,6 +3832,15 @@
           "deprecated": false,
           "internal": false,
           "signature": "retries?: number"
+        },
+        {
+          "name": "requestId",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "requestId?: string"
         }
       ]
     },
@@ -3907,7 +3976,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "health(options?: RequestOptions): Promise<Health>"
+          "signature": "health(options?: RequestOptions): Promise<WithRequestId<Health>>"
         },
         {
           "name": "flush",
@@ -4986,6 +5055,20 @@
           "signature": "logger?: SlenLogger"
         }
       ]
+    },
+    {
+      "name": "WithRequestId",
+      "kind": "type",
+      "source": "src/wire.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": "WithRequestId<T> = T & { readonly _request_id: string | null; }",
+      "members": []
     },
     {
       "name": "apiBase",

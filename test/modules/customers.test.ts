@@ -6,11 +6,12 @@ import {
   InvalidRequestError,
   InvalidResponseError,
   type SlenError,
+  TimeoutError,
 } from '../../src/errors.js';
 import { Slen } from '../../src/slen.js';
 import { FakeFetch } from '../../src/testing/index.js';
 import { outcome } from '../core/harness.js';
-import { account, customer, entry, modules, price } from './harness.js';
+import { account, customer, entry, type Modules, modules, price } from './harness.js';
 
 const UUID_V4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 const BASE = 'https://sdk.example/api';
@@ -316,11 +317,14 @@ describe('customers.entries() and prices()', () => {
     expect(http.last()?.url).toBe(`${BASE}/v1/customers/user_8421/entries?limit=50`);
   });
 
-  it('reads the price list, filtered by equality', async () => {
+  it('reads the price list, filtered by equality, as an object with the id of its response', async () => {
     const { customers, http } = modules();
-    http.push({ body: { data: [price()] } });
+    http.push({ body: { data: [price()] }, headers: { 'X-Request-Id': 'req-prices' } });
 
-    expect(await customers.prices({ operationCode: 'support.reply', creditType: 'default' })).toEqual([price()]);
+    const list = await customers.prices({ operationCode: 'support.reply', creditType: 'default' });
+
+    expect(list).toEqual({ data: [price()] });
+    expect(list._request_id).toBe('req-prices');
     expect(http.last()?.url).toBe(`${BASE}/v1/credit-prices?operation_code=support.reply&credit_type=default`);
   });
 
@@ -329,6 +333,162 @@ describe('customers.entries() and prices()', () => {
     http.push({ body: { data: price() } });
 
     expect(await outcome(customers.prices())).toBeInstanceOf(InvalidResponseError);
+  });
+});
+
+/** The rows a loop gave before it ended, and how it ended: `null` when it ran out of pages. */
+async function drain<T>(rows: AsyncIterable<T>): Promise<{ rows: T[]; error: unknown }> {
+  const seen: T[] = [];
+
+  try {
+    for await (const row of rows) {
+      seen.push(row);
+    }
+  } catch (error) {
+    return { rows: seen, error };
+  }
+
+  return { rows: seen, error: null };
+}
+
+/** The query of each request, as name → value. */
+function queries(http: FakeFetch): Array<Record<string, string>> {
+  return http.requests.map((request) => {
+    const query: Record<string, string> = {};
+    new URL(request.url).searchParams.forEach((value, name) => {
+      query[name] = value;
+    });
+
+    return query;
+  });
+}
+
+const page = <T>(rows: T[], next: string | null): { body: { data: T[]; meta: { limit: number; next_cursor: string | null } } } => ({
+  body: { data: rows, meta: { limit: 2, next_cursor: next } },
+});
+
+describe('customers.listAll() and entriesAll()', () => {
+  it('reads page after page until the cursor is null: two full pages and the empty one at the boundary', async () => {
+    const { customers, http } = modules();
+    const rows = ['user_1', 'user_2', 'user_3', 'user_4'].map((id) => customer({ external_user_id: id }));
+    http.push(page(rows.slice(0, 2), 'c1')).push(page(rows.slice(2), 'c2')).push(page([], null));
+
+    const { rows: read, error } = await drain(customers.listAll({ limit: 2, status: 'active' }));
+
+    expect(error).toBeNull();
+    expect(read).toEqual(rows);
+    expect(queries(http)).toEqual([
+      { view: 'customers', limit: '2', status: 'active' },
+      { view: 'customers', cursor: 'c1', limit: '2', status: 'active' },
+      { view: 'customers', cursor: 'c2', limit: '2', status: 'active' },
+    ]);
+  });
+
+  it('sends nothing until the first row is read, and nothing after a break', async () => {
+    const { customers, http } = modules();
+    http.push(page([customer(), customer()], 'c1'));
+
+    const loop = customers.listAll({ limit: 2 });
+
+    expect(http.requests).toEqual([]);
+
+    for await (const row of loop) {
+      expect(row).toEqual(customer());
+      break;
+    }
+
+    expect(http.requests).toHaveLength(1);
+  });
+
+  it('starts at the cursor of the options', async () => {
+    const { customers, http } = modules();
+    http.push(page([entry()], null));
+
+    await drain(customers.entriesAll('user_8421', { cursor: 'c0', limit: 2, entryType: 'charge' }));
+
+    expect(http.requests.map((request) => new URL(request.url).pathname)).toEqual(['/api/v1/customers/user_8421/entries']);
+    expect(queries(http)).toEqual([{ cursor: 'c0', limit: '2', entry_type: 'charge' }]);
+  });
+
+  it('refuses a cursor that comes back as it was sent, after the rows of that page', async () => {
+    const { customers, http } = modules();
+    http.push(page([entry({ entry_id: '1' })], 'c1')).push({ ...page([entry({ entry_id: '2' })], 'c1'), headers: { 'X-Request-Id': 'req-again' } });
+
+    const { rows, error } = await drain(customers.entriesAll('user_8421', { limit: 2 }));
+
+    expect(rows.map((row) => row.entry_id)).toEqual(['1', '2']);
+    expect(error).toBeInstanceOf(InvalidResponseError);
+    expect(error).toMatchObject({ code: 'invalid_response', requestId: 'req-again' });
+    expect(http.requests).toHaveLength(2);
+  });
+
+  it.each([
+    ['listAll', (customers: Modules['customers']): AsyncIterable<unknown> => customers.listAll({ requestId: 'order-42:customers' })],
+    ['entriesAll', (customers: Modules['customers']): AsyncIterable<unknown> => customers.entriesAll('user_8421', { requestId: 'order-42:entries' })],
+  ] as const)('%s refuses a requestId of its own before the wire: one id names one request', async (_, loop) => {
+    const { customers, http, records } = modules();
+
+    const { rows, error } = await drain(loop(customers));
+
+    expect(rows).toEqual([]);
+    expect(error).toBeInstanceOf(InvalidRequestError);
+    expect(error).toMatchObject({ code: 'invalid_request' });
+    expect(http.requests).toEqual([]);
+    expect(records).toEqual([]);
+  });
+
+  it('gives the retries of the options to each page', async () => {
+    const { customers, http } = modules({ retries: 0 });
+    const unavailable = { status: 503, headers: { 'Retry-After': '0' }, body: { error: { code: 'service_unavailable' } } };
+    http.push(page([entry()], 'c1')).push(unavailable).push(page([entry()], null));
+
+    const { rows, error } = await drain(customers.entriesAll('user_8421', { retries: 1 }));
+
+    expect(error).toBeNull();
+    expect(rows).toHaveLength(2);
+    expect(queries(http).map((query) => query['cursor'] ?? null)).toEqual([null, 'c1', 'c1']);
+  });
+
+  it('gives the timeout of the options to each page', async () => {
+    const { customers, http } = modules({ retries: 0, timeoutMs: 60_000 });
+    http.push(page([customer()], 'c1')).push({ ...page([customer()], null), delayMs: 1_000 });
+
+    const { rows, error } = await drain(customers.listAll({ timeoutMs: 20 }));
+
+    expect(rows).toHaveLength(1);
+    expect(error).toBeInstanceOf(TimeoutError);
+    expect((error as Error).message).toBe('Slen did not answer GET /v1/customers within 20 ms.');
+  });
+
+  it('ends at the signal, with its reason, asking for no page more', async () => {
+    const { customers, http } = modules();
+    const caller = new AbortController();
+    const reason = new Error('the request of the caller ended');
+    http.push(page([customer(), customer()], 'c1'));
+
+    const rows: unknown[] = [];
+    const ended = await outcome(
+      (async (): Promise<void> => {
+        for await (const row of customers.listAll({ signal: caller.signal })) {
+          rows.push(row);
+          caller.abort(reason);
+        }
+      })(),
+    );
+
+    expect(ended).toBe(reason);
+    expect(rows).toHaveLength(2);
+    expect(http.requests).toHaveLength(1);
+  });
+
+  it('gives each row as the page has it: the id of a response is on the page, not on its rows', async () => {
+    const { customers, http } = modules();
+    http.push({ ...page([customer()], null), headers: { 'X-Request-Id': 'req-page' } });
+
+    const { rows } = await drain(customers.listAll());
+
+    expect(rows).toEqual([customer()]);
+    expect(Object.hasOwn(rows[0] as object, '_request_id')).toBe(false);
   });
 });
 

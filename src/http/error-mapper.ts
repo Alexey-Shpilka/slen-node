@@ -129,7 +129,7 @@ function errorOf(answer: Pick<HttpAnswer, 'status' | 'body' | 'requestId'>, more
     code,
     status,
     details,
-    requestId: asString(envelope?.['request_id']) ?? requestId,
+    requestId: requestId ?? asString(envelope?.['request_id']),
     ...more,
   });
 }
