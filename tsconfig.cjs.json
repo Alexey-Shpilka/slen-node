@@ -4,7 +4,7 @@
     "outDir": "dist/cjs",
     "rootDir": "src",
     "module": "CommonJS",
-    "moduleResolution": "Node10",
+    "moduleResolution": "Bundler",
     // The ESM sources import each other with explicit `.js` suffixes (required
     // by Node's ESM resolver). CommonJS `require` resolves those same specifiers
     // fine, so one source tree emits both module systems with no bundler.

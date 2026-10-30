@@ -4,6 +4,7 @@ on:
     branches: [master]
   pull_request: {}
   workflow_dispatch: {}
+  workflow_call: {}
 permissions: { contents: read }
 concurrency: { group: 'ci-${{ github.event_name }}-${{ github.ref }}', cancel-in-progress: true }
 
@@ -48,3 +49,23 @@ jobs:
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with: { node-version: '20.3.0' }
       - run: node scripts/floor.mjs
+
+  # dist/*.d.ts is read by the consumer's TypeScript, not by the one that wrote
+  # it: the help examples, compiled against the packed package on the oldest
+  # TypeScript 5 that reads it and on 7. See scripts/consumer.mjs.
+  typescript-consumer:
+    name: consumer on typescript ${{ matrix.typescript }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        typescript: ['5.0', '7']
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: { persist-credentials: false }
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: node scripts/consumer.mjs "$TYPESCRIPT"
+        env: { TYPESCRIPT: '${{ matrix.typescript }}' }

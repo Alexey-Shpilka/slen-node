@@ -4,8 +4,18 @@ updates:
   - package-ecosystem: github-actions
     directory: /
     schedule: { interval: weekly }
+    groups:
+      actions: { patterns: ['*'], update-types: [minor, patch] }
   # The dev toolchain of package-lock.json; the package itself has no runtime dependency.
   - package-ecosystem: npm
     directory: /
     schedule: { interval: weekly }
     versioning-strategy: increase-if-necessary
+    # A major of the compilers or of the test runner changes the build, the
+    # suite or the scripts that read the AST: work of an iteration.
+    ignore:
+      - { dependency-name: typescript, update-types: ['version-update:semver-major'] }
+      - { dependency-name: typescript-api, update-types: ['version-update:semver-major'] }
+      - { dependency-name: vitest, update-types: ['version-update:semver-major'] }
+    groups:
+      dev-tooling: { patterns: ['*'], update-types: [minor, patch] }

@@ -1,0 +1,51 @@
+name: release
+on:
+  push:
+    tags: ['v*']
+permissions: { contents: read }
+# One release at a time, and a running one is never cancelled: the next tag waits.
+concurrency: { group: release, cancel-in-progress: false }
+
+# A pushed tag vX.Y.Z is the release: the gates of ci.yml run on its commit,
+# then `publish` puts it on npm by trusted publishing (OIDC), with provenance.
+# No job reads a secret, and only `publish` can mint an OIDC token.
+# See .github/AGENTS.md.
+
+jobs:
+  gates:
+    uses: ./.github/workflows/ci.yml
+
+  publish:
+    name: npm publish
+    needs: gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions: { contents: read, id-token: write }
+    steps:
+      # All history: the next step reads master.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: { persist-credentials: false, fetch-depth: 0 }
+      - name: the tag is on master
+        run: |
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/master; then
+            echo "::error::the tagged commit $GITHUB_SHA is not on master"
+            exit 1
+          fi
+      # No cache in the job that can mint the token: a poisoned cache would run beside it.
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with: { node-version: 22, registry-url: 'https://registry.npmjs.org', package-manager-cache: false }
+      - name: the tag is the version of package.json and src/version.ts
+        env: { TAG: '${{ github.ref_name }}' }
+        run: |
+          package=$(node -p "require('./package.json').version")
+          sdk=$(sed -n "s/^export const SDK_VERSION = '\(.*\)';$/\1/p" src/version.ts)
+          if [ "$TAG" != "v$package" ] || [ "$TAG" != "v$sdk" ]; then
+            echo "::error::tag $TAG, package.json $package, src/version.ts $sdk"
+            exit 1
+          fi
+      # Node 22 ships npm 10; trusted publishing needs npm 11.5.1 or later.
+      - run: npm install --global npm@11.21.1
+      # No dependency's install script runs beside the token; `npm publish` runs
+      # `prepare`, which builds dist/.
+      - run: npm ci --ignore-scripts
+      - run: npm publish                                # OIDC, no token; provenance from publishConfig
