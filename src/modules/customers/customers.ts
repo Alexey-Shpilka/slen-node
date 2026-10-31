@@ -1,10 +1,11 @@
 import { INVALID_REQUEST, InvalidRequestError } from '../../errors.js';
 import { type ApiRequest, type CallOptions, type RequestOptions, transportOf } from '../../http/client.js';
 import { endpoint, ENDPOINTS } from '../../http/endpoints.js';
+import { rowsOf } from '../../http/pages.js';
 import { generateIdempotencyKey } from '../../idempotency.js';
-import type { Page } from '../../wire.js';
+import type { Page, WithRequestId } from '../../wire.js';
 import type { ModuleContext } from '../context.js';
-import type { CreditEntry, CreditEntryType, CreditPrice, Customer, CustomerAccount, CustomerStatus } from './types.js';
+import type { CreditEntry, CreditEntryType, CreditPriceList, Customer, CustomerAccount, CustomerStatus } from './types.js';
 
 export interface CustomerListOptions extends RequestOptions {
   /** `meta.next_cursor` of the page before. */
@@ -78,7 +79,7 @@ export class CustomersModule {
   }
 
   /** One page of customers, newest first, each with every account it holds. @throws SlenError */
-  list(options: CustomerListOptions = {}): Promise<Page<Customer>> {
+  list(options: CustomerListOptions = {}): Promise<WithRequestId<Page<Customer>>> {
     return this.#context.api.request<Page<Customer>>({
       ...endpoint(ENDPOINTS.listCustomers),
       query: {
@@ -95,18 +96,23 @@ export class CustomersModule {
     });
   }
 
+  /** Every customer `list()` reads, page after page, one request a page as the loop reaches it. @throws SlenError */
+  listAll(options: CustomerListOptions = {}): AsyncGenerator<Customer, void, undefined> {
+    return rowsOf({ operation: ENDPOINTS.listCustomers, options }, (cursor) => this.list(cursor === undefined ? options : { ...options, cursor }));
+  }
+
   /** One customer with its accounts; one the project has never seen is `CustomerNotFoundError`. @throws SlenError */
-  get(externalUserId: string, options: RequestOptions = {}): Promise<Customer> {
+  get(externalUserId: string, options: RequestOptions = {}): Promise<WithRequestId<Customer>> {
     return this.#context.api.request<Customer>({ ...endpoint(ENDPOINTS.getCustomer), params: { externalUserId }, ...transportOf(options) });
   }
 
   /** Makes sure the customer exists, with no account and no credits; answers the one there is otherwise. @throws SlenError */
-  create(externalUserId: string, options: RequestOptions = {}): Promise<Customer> {
+  create(externalUserId: string, options: RequestOptions = {}): Promise<WithRequestId<Customer>> {
     return this.#context.api.request<Customer>({ ...endpoint(ENDPOINTS.createCustomer), params: { externalUserId }, body: {}, ...transportOf(options) });
   }
 
   /** Sets the settings of the account of one credit type, creating the customer and the account if need be. @throws SlenError */
-  updateAccount(externalUserId: string, creditType: string, options: AccountOptions = {}): Promise<CustomerAccount> {
+  updateAccount(externalUserId: string, creditType: string, options: AccountOptions = {}): Promise<WithRequestId<CustomerAccount>> {
     return this.#context.api.request<CustomerAccount>({
       ...endpoint(ENDPOINTS.updateAccount),
       params: { externalUserId, creditType },
@@ -116,7 +122,7 @@ export class CustomersModule {
   }
 
   /** Blocks the customer: its new runs are refused `CustomerBlockedError`; its credits can still move. @throws SlenError */
-  block(externalUserId: string, options: BlockOptions = {}): Promise<Customer> {
+  block(externalUserId: string, options: BlockOptions = {}): Promise<WithRequestId<Customer>> {
     return this.#context.api.request<Customer>({
       ...endpoint(ENDPOINTS.block),
       params: { externalUserId },
@@ -126,14 +132,14 @@ export class CustomersModule {
   }
 
   /** Lifts the block: the customer is `active` again. @throws SlenError */
-  unblock(externalUserId: string, options: RequestOptions = {}): Promise<Customer> {
+  unblock(externalUserId: string, options: RequestOptions = {}): Promise<WithRequestId<Customer>> {
     return this.#context.api.request<Customer>({ ...endpoint(ENDPOINTS.unblock), params: { externalUserId }, body: {}, ...transportOf(options) });
   }
 
   /** Deletes a customer nothing ever happened to; one with history is refused `customer_has_history`: block it instead. @throws SlenError */
   async delete(externalUserId: string, options: RequestOptions = {}): Promise<void> {
     // A repeat after no answer that finds no customer: the attempt that got no answer deleted it.
-    await this.#context.api.request<undefined>({
+    await this.#context.api.requestNoContent({
       ...endpoint(ENDPOINTS.deleteCustomer),
       params: { externalUserId },
       doneAfterNoAnswer: 'customer_not_found',
@@ -142,22 +148,22 @@ export class CustomersModule {
   }
 
   /** Adds credits, creating the customer and the account if need be. A repeated key moves nothing. @throws SlenError */
-  topUp(externalUserId: string, credits: string, options: MovementOptions = {}): Promise<CustomerAccount> {
+  topUp(externalUserId: string, credits: string, options: MovementOptions = {}): Promise<WithRequestId<CustomerAccount>> {
     return this.#move({ movement: 'topUp', externalUserId, credits }, options);
   }
 
   /** Takes credits for a service of the application; an account that cannot cover it is `InsufficientCreditsError`. @throws SlenError */
-  charge(externalUserId: string, credits: string, options: MovementOptions = {}): Promise<CustomerAccount> {
+  charge(externalUserId: string, credits: string, options: MovementOptions = {}): Promise<WithRequestId<CustomerAccount>> {
     return this.#move({ movement: 'charge', externalUserId, credits }, options);
   }
 
   /** Corrects the balance by a signed amount other than zero. @throws SlenError */
-  adjust(externalUserId: string, credits: string, options: MovementOptions = {}): Promise<CustomerAccount> {
+  adjust(externalUserId: string, credits: string, options: MovementOptions = {}): Promise<WithRequestId<CustomerAccount>> {
     return this.#move({ movement: 'adjust', externalUserId, credits }, options);
   }
 
   /** One page of the customer's statement, newest first; a customer with no account has an empty one. @throws SlenError */
-  entries(externalUserId: string, options: EntryListOptions = {}): Promise<Page<CreditEntry>> {
+  entries(externalUserId: string, options: EntryListOptions = {}): Promise<WithRequestId<Page<CreditEntry>>> {
     return this.#context.api.request<Page<CreditEntry>>({
       ...endpoint(ENDPOINTS.entries),
       params: { externalUserId },
@@ -172,9 +178,16 @@ export class CustomersModule {
     });
   }
 
+  /** Every entry of the statement `entries()` reads, page after page, one request a page as the loop reaches it. @throws SlenError */
+  entriesAll(externalUserId: string, options: EntryListOptions = {}): AsyncGenerator<CreditEntry, void, undefined> {
+    return rowsOf({ operation: ENDPOINTS.entries, options }, (cursor) =>
+      this.entries(externalUserId, cursor === undefined ? options : { ...options, cursor }),
+    );
+  }
+
   /** The price list: how many credits one run of an operation holds from its customer. @throws SlenError */
-  prices(options: PriceListOptions = {}): Promise<CreditPrice[]> {
-    return this.#context.api.request<CreditPrice[]>({
+  prices(options: PriceListOptions = {}): Promise<WithRequestId<CreditPriceList>> {
+    return this.#context.api.request<CreditPriceList>({
       ...endpoint(ENDPOINTS.prices),
       query: { operation_code: options.operationCode, credit_type: options.creditType },
       envelope: 'list',
@@ -182,7 +195,7 @@ export class CustomersModule {
     });
   }
 
-  async #move(move: Move, options: MovementOptions): Promise<CustomerAccount> {
+  async #move(move: Move, options: MovementOptions): Promise<WithRequestId<CustomerAccount>> {
     refuseCredits(move.movement, move.credits);
 
     // An empty credit type would be read as `default`: credits would move on another account.

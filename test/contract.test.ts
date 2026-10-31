@@ -181,7 +181,8 @@ interface Call {
    * whose `run` sends nothing but required keys needs none.
    */
   bare?: (client: Slen) => Promise<unknown>;
-  answer: QueuedResponse;
+  /** One answer; a loop over pages gets one a page and has to read at least two. */
+  answer: QueuedResponse | readonly QueuedResponse[];
   /**
    * The type the call's answer is read as, and where in the body it sits. Null
    * when nothing typed is read off a JSON body (a 204). Held against the
@@ -192,6 +193,16 @@ interface Call {
 }
 
 const DATA = (data: unknown): QueuedResponse => ({ body: { data } });
+/** Every row of a loop over pages, read to the end. */
+const DRAIN = async (rows: AsyncIterable<unknown>): Promise<unknown[]> => {
+  const read: unknown[] = [];
+
+  for await (const row of rows) {
+    read.push(row);
+  }
+
+  return read;
+};
 const STATUS: Returns = { data: 'ExecutionStatusView' };
 const CUSTOMER: Returns = { data: 'Customer' };
 const ACCOUNT: Returns = { data: 'CustomerAccount' };
@@ -253,6 +264,16 @@ const ROWS: Record<string, Row> = {
     answer: { body: { data: [customer()], meta: { limit: 30, next_cursor: null } } },
     returns: { data: 'Customer[]', meta: 'CursorMeta' },
   },
+  // A loop: the first page with the cursor of the options, the next with the one the first answered.
+  'customers.listAll': {
+    run: (client) =>
+      DRAIN(client.customers.listAll({ cursor: 'eyJpZCI6MX0', limit: 1, search: 'user', status: 'active', creditType: 'enrichment', lowBalance: '10' })),
+    answer: [
+      { body: { data: [customer()], meta: { limit: 1, next_cursor: '74438200973594624' } } },
+      { body: { data: [], meta: { limit: 1, next_cursor: null } } },
+    ],
+    returns: { data: 'Customer[]', meta: 'CursorMeta' },
+  },
   'customers.get': {
     run: (client) => client.customers.get(CUSTOMER_ID),
     answer: DATA(customer()),
@@ -305,6 +326,14 @@ const ROWS: Record<string, Row> = {
   'customers.entries': {
     run: (client) => client.customers.entries(CUSTOMER_ID, { cursor: 'eyJpZCI6MX0', limit: 30, creditType: 'enrichment', entryType: 'charge' }),
     answer: { body: { data: [entry()], meta: { limit: 30, next_cursor: null } } },
+    returns: { data: 'CreditEntry[]', meta: 'CursorMeta' },
+  },
+  'customers.entriesAll': {
+    run: (client) => DRAIN(client.customers.entriesAll(CUSTOMER_ID, { cursor: 'eyJpZCI6MX0', limit: 1, creditType: 'enrichment', entryType: 'charge' })),
+    answer: [
+      { body: { data: [entry()], meta: { limit: 1, next_cursor: '74438200973594800' } } },
+      { body: { data: [], meta: { limit: 1, next_cursor: null } } },
+    ],
     returns: { data: 'CreditEntry[]', meta: 'CursorMeta' },
   },
   'customers.prices': {
@@ -411,14 +440,15 @@ const SENT: Record<string, Sent> = {};
 /** What the `bare` form of a row sent, for the rows that have one. */
 const BARE: Record<string, Sent> = {};
 
-async function send(name: string, run: Call['run'], answer: QueuedResponse): Promise<Sent> {
+async function send(name: string, run: Call['run'], answer: Call['answer']): Promise<Sent> {
   const { client, http } = harness();
-  http.push(answer);
+  const answers: readonly QueuedResponse[] = Array.isArray(answer) ? answer : [answer as QueuedResponse];
+  answers.forEach((each) => http.push(each));
 
   await run(client);
 
-  if (http.requests.length !== 1) {
-    throw new Error(`${name} made ${http.requests.length} requests; a row of the call table is one request.`);
+  if (http.requests.length !== answers.length) {
+    throw new Error(`${name} made ${http.requests.length} requests; a row of the call table is one request, a loop one a page it is given.`);
   }
 
   const request = http.requests[0] as RecordedRequest;
@@ -429,9 +459,18 @@ async function send(name: string, run: Call['run'], answer: QueuedResponse): Pro
     throw new Error(`${name} called ${path}, outside the /api prefix every path of the spec is served under.`);
   }
 
-  // `forEach`, not `keys()`: the package compiles without `DOM.Iterable`.
+  // `forEach`, not `keys()`: the package compiles without `DOM.Iterable`. A loop's names are those of all its pages.
   const query = new Set<string>();
-  url.searchParams.forEach((_value, key) => query.add(key));
+
+  for (const page of http.requests) {
+    const pageUrl = new URL(page.url);
+
+    if (page.method !== request.method || pageUrl.pathname !== path) {
+      throw new Error(`${name} read a page with ${page.method} ${pageUrl.pathname} after ${request.method} ${path}: a loop makes one operation.`);
+    }
+
+    pageUrl.searchParams.forEach((_value, key) => query.add(key));
+  }
 
   return {
     method: request.method,
@@ -1056,6 +1095,10 @@ const WEBHOOK_EVENTS =
 /** Types of the type files that transcribe no schema, each with why. */
 const NOT_COMPARED: Record<string, string> = {
   Page: 'A generic wrapper, `{ data: T[], meta: CursorMeta }`: no schema of its own in the spec either. `T` and `CursorMeta` are compared on their own.',
+  WithRequestId:
+    'An answer with `_request_id` beside its fields: the value of the `X-Request-Id` header, not of the body. `test/core/request-id.test.ts` holds it on every call that reads an answer.',
+  CreditPriceList:
+    'The body of `GET /v1/credit-prices`, `{ data: CreditPrice[] }`, which the spec writes in place: `customers.prices` reads it whole, `CreditPrice` is compared on its own, and the envelope by the row of the call.',
   WebhookEventType: 'Derived from `WEBHOOK_EVENT_TYPES`, which `test/modules/spec.test.ts` holds to the schema `WebhookEventType` and to the keys of `webhooks:`.',
   WebhookEventEnvelope: WEBHOOK_EVENTS,
   ExecutionFinishedEvent: WEBHOOK_EVENTS,
@@ -1172,7 +1215,9 @@ describe('the call table of the contract test', () => {
   // method's own return type here, and against the spec further down — so the
   // two ends meet: the type a caller gets is the schema the operation answers.
   it('names, in every row, the types its call is declared to return', () => {
-    const wrappers: Record<string, string[]> = { Page: ['CursorMeta'] };
+    // What a wrapper of the answer stands for in the body: a page its `meta`, a loop the `meta` of each page it
+    // reads, the price list its rows; the id of the response is a header, nothing of the body.
+    const wrappers: Record<string, string[]> = { Page: ['CursorMeta'], AsyncGenerator: ['CursorMeta'], CreditPriceList: ['CreditPrice'], WithRequestId: [] };
     const problems: string[] = [];
 
     for (const [name, type] of publicCallsOfTheClient()) {

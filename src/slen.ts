@@ -10,6 +10,7 @@ import { OperationsModule } from './modules/operations/operations.js';
 import { WebhooksModule } from './modules/webhooks/webhooks.js';
 import { OtlpSpanRecorder } from './observability/otlp.js';
 import { MultiSpanRecorder, NullSpanRecorder, type SpanRecorder } from './observability/recorder.js';
+import type { WithRequestId } from './wire.js';
 
 /** The body of `GET /health`: the process serves, and how each dependency answered. */
 export interface Health {
@@ -80,7 +81,7 @@ export class Slen {
   }
 
   /** Liveness of the API: a dependency that is down is named in the body, not in the status. @throws SlenError */
-  health(options: RequestOptions = {}): Promise<Health> {
+  health(options: RequestOptions = {}): Promise<WithRequestId<Health>> {
     return this.#api.request<Health>({ ...endpoint(ENDPOINTS.health), envelope: false, ...transportOf(options) });
   }
 

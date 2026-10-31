@@ -227,12 +227,12 @@ describe('an answer after no answer', () => {
     const { api, http } = chain({ timeoutMs: 20 });
     http.push({ delayMs: 1_000, body: {} }).push(GONE);
 
-    expect(await api.request({ ...DELETE, doneAfterNoAnswer: 'customer_not_found' })).toBeUndefined();
+    expect(await api.requestNoContent({ ...DELETE, doneAfterNoAnswer: 'customer_not_found' })).toBeUndefined();
 
     const plain = chain({ timeoutMs: 20 });
     plain.http.push({ delayMs: 1_000, body: {} }).push(GONE);
 
-    expect(await outcome(plain.api.request(DELETE))).toMatchObject({ code: 'customer_not_found', status: 404 });
+    expect(await outcome(plain.api.requestNoContent(DELETE))).toMatchObject({ code: 'customer_not_found', status: 404 });
   });
 });
 

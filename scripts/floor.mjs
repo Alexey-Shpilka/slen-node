@@ -40,8 +40,8 @@ const RUN = {
 
 // The package's entry point: the HTTP chain on the runtime's own `fetch`, `AbortController` and
 // timers — a retry after a 503, the journal, a timed-out attempt of a copy with its own logger — and
-// the modules: a run handed to a worker, a wait on it, its spans out through OTLP, a customer's page
-// and a delete answered 204.
+// the modules: a run handed to a worker, a wait on it, its spans out through OTLP, a customer's page,
+// every page of a loop (an async generator), the id of a response on an answer, and a delete answered 204.
 async function exercise(sdk) {
   const http = new sdk.FakeFetch();
   const collector = new sdk.FakeFetch();
@@ -60,15 +60,19 @@ async function exercise(sdk) {
   });
 
   http.push({ status: 503, headers: { 'Retry-After': '0' }, body: {} });
-  http.push({ body: { app: 'slen', mysql: 'ok' } });
+  http.push({ body: { app: 'slen', mysql: 'ok' }, headers: { 'X-Request-Id': 'req-floor-health' } });
   http.push({ status: 202, body: { data: RUN } });
   http.push({ body: { data: { ...RUN, status: 'completed', waiting_on: null, retry_after_seconds: undefined } } });
   http.push({ body: { data: [], meta: { limit: 50, next_cursor: null } } });
+  http.push({ body: { data: [{ external_user_id: 'floor-a' }], meta: { limit: 1, next_cursor: 'c1' } } });
+  http.push({ body: { data: [{ external_user_id: 'floor-b' }], meta: { limit: 1, next_cursor: null } } });
   http.push({ status: 204 });
   http.push({ delayMs: 2_000, body: {} });
 
   const health = await slen.health();
   assert.equal(health.app, 'slen');
+  assert.equal(health._request_id, 'req-floor-health');
+  assert.deepEqual(Object.keys(health), ['app', 'mysql']);
   assert.equal(http.last().url, 'https://floor.example/api/health');
   assert.equal(http.last().headers['user-agent'], `slen-sdk-node/${manifest.version} node/${process.versions.node}`);
   assert.deepEqual(journal, ['slen.request', 'slen.retry', 'slen.request', 'slen.response']);
@@ -90,6 +94,14 @@ async function exercise(sdk) {
 
   assert.deepEqual(await slen.customers.list(), { data: [], meta: { limit: 50, next_cursor: null } });
   assert.equal(http.last().url, 'https://floor.example/api/v1/customers?view=customers&limit=50');
+
+  const everyone = [];
+  for await (const customer of slen.customers.listAll({ limit: 1 })) {
+    everyone.push(customer.external_user_id);
+  }
+  assert.deepEqual(everyone, ['floor-a', 'floor-b']);
+  assert.equal(http.last().url, 'https://floor.example/api/v1/customers?view=customers&cursor=c1&limit=1');
+
   assert.equal(await slen.customers.delete('floor-user'), undefined);
 
   const written = journal.length;

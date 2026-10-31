@@ -1,6 +1,6 @@
 {
   "name": "@slen/sdk",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "Slen TypeScript SDK — run flows and read their outcome, manage end customers and their credits, verify webhooks.",
   "license": "MIT",
   "author": "Alexey Shpilka",
@@ -64,7 +64,7 @@
   "devDependencies": {
     "typescript": "^7.0.2",
     "typescript-api": "npm:typescript@~6.0.3",
-    "vitest": "^3.0.5",
+    "vitest": "^5.0.5",
     "yaml": "^2.9.1"
   }
 }

@@ -3,6 +3,7 @@ import { type Endpoint, endpoint, ENDPOINTS } from '../../http/endpoints.js';
 import { contractTypeOf } from '../../http/logging.js';
 import { LOG_EVENTS, writeLog } from '../../logger.js';
 import { SpanScope } from '../../observability/scope.js';
+import type { WithRequestId } from '../../wire.js';
 import { type Clock, type ModuleContext, SYSTEM_CLOCK } from '../context.js';
 import type { ExecutionStatusView, ExecutionTrace } from './types.js';
 import {
@@ -28,12 +29,12 @@ export class ExecutionsModule {
   }
 
   /** The polling view of one run, read once. Writes no span. @throws SlenError */
-  get(executionId: string, options: RequestOptions = {}): Promise<ExecutionStatusView> {
+  get(executionId: string, options: RequestOptions = {}): Promise<WithRequestId<ExecutionStatusView>> {
     return this.#context.api.request<ExecutionStatusView>(read(ENDPOINTS.executionStatus, executionId, options));
   }
 
   /** Reads the run until it is over, at the pace the server asks; at the timeout, answers the last state read. @throws SlenError */
-  async wait(executionId: string, options: WaitOptions = {}): Promise<ExecutionStatusView> {
+  async wait(executionId: string, options: WaitOptions = {}): Promise<WithRequestId<ExecutionStatusView>> {
     refuseBeforeTheWire(read(ENDPOINTS.executionStatus, executionId, options));
 
     const span = new SpanScope(this.#context.spans, { operation: 'executions.wait', executionId }, () => this.#clock.now());
@@ -52,11 +53,11 @@ export class ExecutionsModule {
   }
 
   /** The trace of one run: every node, event and provider attempt. @throws SlenError */
-  trace(executionId: string, options: RequestOptions = {}): Promise<ExecutionTrace> {
+  trace(executionId: string, options: RequestOptions = {}): Promise<WithRequestId<ExecutionTrace>> {
     return this.#context.api.request<ExecutionTrace>(read(ENDPOINTS.executionTrace, executionId, options));
   }
 
-  async #poll(executionId: string, options: WaitOptions, progress: Progress): Promise<ExecutionStatusView> {
+  async #poll(executionId: string, options: WaitOptions, progress: Progress): Promise<WithRequestId<ExecutionStatusView>> {
     const { config } = this.#context;
     const deadline = this.#clock.now() + waitMs(options.timeoutSeconds);
     let failure: unknown = null;
@@ -68,7 +69,7 @@ export class ExecutionsModule {
         throw options.signal?.reason;
       }
 
-      let answered: ExecutionStatusView | null = null;
+      let answered: WithRequestId<ExecutionStatusView> | null = null;
 
       try {
         answered = await this.#context.api.request<ExecutionStatusView>({
@@ -108,7 +109,7 @@ export class ExecutionsModule {
       }
 
       if (over) {
-        return answered as ExecutionStatusView;
+        return answered as WithRequestId<ExecutionStatusView>;
       }
 
       if (pause === null) {
@@ -132,7 +133,7 @@ function aborted(signal: AbortSignal | undefined): boolean {
 }
 
 interface Progress {
-  seen: ExecutionStatusView | null;
+  seen: WithRequestId<ExecutionStatusView> | null;
 }
 
 function read(operation: Endpoint, executionId: string, options: RequestOptions): ApiRequest {

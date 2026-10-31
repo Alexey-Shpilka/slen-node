@@ -29,7 +29,7 @@ export class SlenError extends Error {
   /** The HTTP status; null when there was no answer. */
   readonly status: number | null;
   readonly details: Record<string, unknown>;
-  /** `X-Request-Id` of the answer: what support finds the request by. */
+  /** `X-Request-Id` of the answer, or the call's own `requestId` when none came: what support finds the request by. */
   readonly requestId: string | null;
   /** How long the answer asked to wait (`Retry-After` of a 429 or 503), in seconds; null when it did not say. */
   readonly retryAfterSeconds: number | null;

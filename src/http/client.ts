@@ -8,6 +8,7 @@ import {
   TimeoutError,
 } from '../errors.js';
 import { SDK_VERSION } from '../version.js';
+import type { WithRequestId } from '../wire.js';
 import { errorFromAnswer } from './error-mapper.js';
 import type { HttpJournal } from './logging.js';
 
@@ -21,6 +22,8 @@ export interface RequestOptions {
   timeoutMs?: number;
   /** Replaces the client's `retries` for this call: a whole number of attempts after the first; `0` sends it once. */
   retries?: number;
+  /** Your own id of this request, sent as `X-Request-Id` on each attempt: 8 to 128 of `A-Z a-z 0-9 . _ : -`. */
+  requestId?: string;
 }
 
 /** What a call that carries an idempotency key may say about its own request. */
@@ -40,6 +43,7 @@ export interface ApiRequest {
   readonly signal?: AbortSignal;
   readonly timeoutMs?: number;
   readonly retries?: number;
+  readonly requestId?: string;
   readonly envelope?: false | 'list' | 'page';
   readonly doneAfterNoAnswer?: string;
 }
@@ -62,6 +66,9 @@ export interface HttpClient {
 
 // The headers the SDK owns; `headers` of the options cannot replace them.
 const OWN_HEADERS = new Set(['authorization', 'accept', 'content-type', 'idempotency-key']);
+
+// What the API keeps of a caller's `X-Request-Id`; anything else it silently replaces with a UUID.
+const REQUEST_ID = /^[A-Za-z0-9._:-]{8,128}$/;
 
 // `setTimeout` keeps its delay in a signed 32-bit integer and fires at once beyond it.
 const LONGEST_TIMER_MS = 2_147_483_647;
@@ -149,10 +156,11 @@ export class FetchClient implements HttpClient {
       }
 
       const where = `${request.method} ${request.route}`;
+      const sent = { requestId: request.requestId ?? null };
 
       throw clock.expired
-        ? new TimeoutError(`Slen did not answer ${where} within ${timeoutMs} ms.`)
-        : new ConnectionError(`Slen could not be reached for ${where}: ${describe(error)}`);
+        ? new TimeoutError(`Slen did not answer ${where} within ${timeoutMs} ms.`, sent)
+        : new ConnectionError(`Slen could not be reached for ${where}: ${describe(error)}`, sent);
     } finally {
       clock.stop();
     }
@@ -170,7 +178,18 @@ export class ApiClient {
   }
 
   /** @throws SlenError for a refusal, no answer, or an answer that cannot be read */
-  async request<T>(request: ApiRequest): Promise<T> {
+  async request<T extends object>(request: ApiRequest): Promise<WithRequestId<T>> {
+    const { data, requestId } = await this.#exchange(request, true);
+
+    return withRequestId(data as T, requestId);
+  }
+
+  /** @throws SlenError for a refusal, no answer, or an answer that cannot be read */
+  async requestNoContent(request: ApiRequest): Promise<void> {
+    await this.#exchange(request, false);
+  }
+
+  async #exchange(request: ApiRequest, wantsBody: boolean): Promise<{ data: unknown; requestId: string | null }> {
     refuseBeforeTheWire(request);
 
     const started = Date.now();
@@ -182,7 +201,7 @@ export class ApiClient {
       if (answer.afterNoAnswer && request.doneAfterNoAnswer !== undefined && error.code === request.doneAfterNoAnswer) {
         this.#journal.response(request, answer, Date.now() - started);
 
-        return undefined as T;
+        return { data: undefined, requestId: answer.requestId };
       }
 
       this.#journal.rejected(request, error, answer.attempts);
@@ -193,7 +212,7 @@ export class ApiClient {
     let data: unknown;
 
     try {
-      data = dataOf(request, answer);
+      data = dataOf(request, answer, wantsBody);
     } catch (error) {
       this.#journal.rejected(request, error as InvalidResponseError, answer.attempts);
 
@@ -202,8 +221,13 @@ export class ApiClient {
 
     this.#journal.response(request, answer, Date.now() - started);
 
-    return data as T;
+    return { data, requestId: answer.requestId };
   }
+}
+
+// Not enumerable: `JSON.stringify`, a spread and `Object.keys` see the body as it came.
+function withRequestId<T extends object>(data: T, requestId: string | null): WithRequestId<T> {
+  return Object.defineProperty(data, '_request_id', { value: requestId, enumerable: false }) as WithRequestId<T>;
 }
 
 function describe(error: unknown): string {
@@ -240,14 +264,22 @@ export function refuseBeforeTheWire(request: ApiRequest): void {
       { code: INVALID_REQUEST },
     );
   }
+
+  if (request.requestId !== undefined && !(typeof request.requestId === 'string' && REQUEST_ID.test(request.requestId))) {
+    throw new InvalidRequestError(
+      `Slen: the request id of ${request.method} ${request.route} must be 8 to 128 of A-Z, a-z, 0-9, ".", "_", ":" and "-".`,
+      { code: INVALID_REQUEST },
+    );
+  }
 }
 
 /** @internal */
-export function transportOf(options: RequestOptions): Pick<ApiRequest, 'signal' | 'timeoutMs' | 'retries'> {
+export function transportOf(options: RequestOptions): Pick<ApiRequest, 'signal' | 'timeoutMs' | 'retries' | 'requestId'> {
   return {
     ...(options.signal === undefined ? {} : { signal: options.signal }),
     ...(options.timeoutMs === undefined ? {} : { timeoutMs: options.timeoutMs }),
     ...(options.retries === undefined ? {} : { retries: options.retries }),
+    ...(options.requestId === undefined ? {} : { requestId: options.requestId }),
   };
 }
 
@@ -280,7 +312,10 @@ function headersOf(config: SlenConfig, request: ApiRequest): Record<string, stri
       delete headers['User-Agent'];
     }
 
-    if (!OWN_HEADERS.has(lower)) {
+    // The call's own id wins over one the client sends with every request.
+    const replaced = OWN_HEADERS.has(lower) || (lower === 'x-request-id' && request.requestId !== undefined);
+
+    if (!replaced) {
       headers[name] = value;
     }
   }
@@ -294,6 +329,10 @@ function headersOf(config: SlenConfig, request: ApiRequest): Record<string, stri
 
   if (request.idempotencyKey !== undefined) {
     headers['Idempotency-Key'] = request.idempotencyKey;
+  }
+
+  if (request.requestId !== undefined) {
+    headers['X-Request-Id'] = request.requestId;
   }
 
   return headers;
@@ -320,7 +359,11 @@ function answerOf(response: Response, text: string): HttpAnswer {
 }
 
 /** @throws InvalidResponseError when the body is not one of the API's answers */
-function dataOf(request: ApiRequest, answer: HttpAnswer): unknown {
+function dataOf(request: ApiRequest, answer: HttpAnswer, wantsBody: boolean): unknown {
+  if (answer.status === 204 && wantsBody) {
+    throw unreadable(request, answer, 'no body');
+  }
+
   if (answer.status === 204) {
     return undefined;
   }
@@ -343,6 +386,10 @@ function dataOf(request: ApiRequest, answer: HttpAnswer): unknown {
 
   if (request.envelope === 'list' && !Array.isArray(data)) {
     throw unreadable(request, answer, 'a `data` that is not a list');
+  }
+
+  if (request.envelope === 'list') {
+    return { data };
   }
 
   if (request.envelope === 'page') {

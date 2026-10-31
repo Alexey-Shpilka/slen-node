@@ -44,6 +44,13 @@ for (const entry of statement.data) {
 }
 // docs:end
 
+// docs:start statement-all
+// Every entry, page after page: the next page is asked for when the loop gets to it.
+for await (const entry of slen.customers.entriesAll('user_8421', { limit: 2 })) {
+  console.log(entry.entry_type, entry.credits, entry.note);
+}
+// docs:end
+
 // docs:start refused
 import { InsufficientCreditsError } from '@slen/sdk';
 
