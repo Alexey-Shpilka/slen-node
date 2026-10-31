@@ -2,7 +2,7 @@
   "id": "spans",
   "status": "ready",
   "summary": "Spans written to a logger: the recorder each SDK ships for a log (LoggerSpanRecorder, Psr3SpanRecorder) handed to the SDK, one request through a flow, and the line the span becomes — its name, outcome, status, operation code, run and estimate.",
-  "languages": ["node", "php"],
+  "languages": ["node", "php", "python"],
   "regions": ["recorder", "client", "send"],
   "responses": [
     {

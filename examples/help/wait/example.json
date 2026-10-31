@@ -1,8 +1,8 @@
 {
   "id": "wait",
   "status": "ready",
-  "summary": "An async run: submit it, get `queued` back at once, wait for the end with wait(); one status read is rate-limited on the way, which the wait rides out and reports to onPollError.",
-  "languages": ["node", "php"],
+  "summary": "An async run: submit it, get `queued` back at once, wait for the end with wait(); one status read is rate-limited on the way, which the wait rides out and reports to the callback it was given for a failed status read (onPollError, on_poll_error in Python).",
+  "languages": ["node", "php", "python"],
   "regions": ["client", "submit", "wait", "result"],
   "responses": [
     {

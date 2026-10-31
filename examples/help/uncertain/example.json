@@ -2,7 +2,7 @@
   "id": "uncertain",
   "status": "ready",
   "summary": "An unknown outcome and what to do about it: execute() raises the typed error of a 504 operation_uncertain, which the example catches and does not send again under a new key; the same request repeated under its own key runs nothing and is answered with the execution, uncertain, with the same code.",
-  "languages": ["node", "php"],
+  "languages": ["node", "php", "python"],
   "regions": ["client", "call", "repeat"],
   "responses": [
     {

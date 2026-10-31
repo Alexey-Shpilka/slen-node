@@ -2,7 +2,7 @@
   "id": "execute",
   "status": "ready",
   "summary": "A request through a flow with the context of the call: the input, the customer and a value of your own in context, your own idempotency key, and the answer read by its status.",
-  "languages": ["node", "php"],
+  "languages": ["node", "php", "python"],
   "regions": ["client", "send", "result"],
   "responses": [
     {

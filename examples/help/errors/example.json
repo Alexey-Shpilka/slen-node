@@ -2,7 +2,7 @@
   "id": "errors",
   "status": "ready",
   "summary": "A refusal in its two forms: execute() raises the typed error of a 402 budget_exceeded, which the example catches by type and branches on by code; the same request repeated under its key is answered with the execution, rejected, with the same code.",
-  "languages": ["node", "php"],
+  "languages": ["node", "php", "python"],
   "regions": ["client", "catch", "repeat"],
   "responses": [
     {

@@ -1,8 +1,8 @@
 {
   "id": "configure",
   "status": "ready",
-  "summary": "An SDK built with options of its own — a longer timeout, a shorter connect timeout, more retries, a logger — and one run through a flow; in Node.js the key comes from SLEN_API_KEY.",
-  "languages": ["node", "php"],
+  "summary": "An SDK built with options of its own — a longer timeout, a shorter connect timeout, more retries, a logger — and one run through a flow; in Node.js and Python the key comes from SLEN_API_KEY.",
+  "languages": ["node", "php", "python"],
   "regions": ["client", "call"],
   "responses": [
     {

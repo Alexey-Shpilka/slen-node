@@ -18,8 +18,9 @@ import { EXAMPLES as EXAMPLE_ROOT } from './paths.js';
  * The checks that only read files are made here for the files of this
  * package — each `node.ts` (its regions, what a region may not show, what it
  * may not lean on) — and for the JSON of every example in the tree (layout,
- * `responses`, the estimate an execution refused by a budget keeps). The PHP
- * suite makes the same checks for its `php.php`; the checks across languages
+ * `responses`, the estimate an execution refused by a budget keeps, the
+ * framework a Python-only example runs in). The PHP and Python suites make the
+ * same checks for their `php.php` and `python.py`; the checks across languages
  * (the same regions in each, `languages` = the files, one `expect.json`) are
  * `scripts/check-examples.mjs` of the SDK's source repository. With the API's
  * OpenAPI spec at hand — the file `SLEN_OPENAPI_SPEC` names — every answer an
@@ -53,9 +54,99 @@ const BASE_URL = 'https://api.slen.ai';
 const KEY_VARIABLE = 'SLEN_API_KEY';
 const KEY = 'sl_live_help_example';
 
-type Language = 'node' | 'php';
+type Language = 'node' | 'php' | 'python';
 
-const FILES: Record<Language, string> = { node: 'node.ts', php: 'php.php' };
+/** The file of each language an example is written in; this package runs `node.ts`. */
+const FILES: Record<Language, string> = { node: 'node.ts', php: 'php.php', python: 'python.py' };
+
+/**
+ * One request the test client of a Python framework sends to the
+ * application of a `framework` example, and what the application answers it
+ * with — see `frameworkProblems`.
+ */
+interface FrameworkRequest {
+  method: string;
+  /** The path of the example's own application. */
+  path: string;
+  headers?: Record<string, string>;
+  body?: unknown;
+  status: number;
+  /** The JSON body of the application's answer, compared whole when given. */
+  answer?: unknown;
+}
+
+const FRAMEWORK_KEYS: readonly string[] = ['name', 'requests'];
+
+const FRAMEWORK_REQUEST_KEYS: readonly string[] = ['method', 'path', 'headers', 'body', 'status', 'answer'];
+
+/**
+ * What is wrong with the `framework` of an `example.json`, in words: an
+ * example that is an application of a Python framework (`fastapi`, `django`)
+ * names it and the requests its test client sends, in order — and only an
+ * example written for Python alone does. The Python suite runs it; here only
+ * its shape is held, as the canon's `check-examples.mjs` holds where it may be.
+ */
+function frameworkProblems(framework: unknown, languages: readonly string[]): string[] {
+  if (framework === undefined) {
+    return [];
+  }
+
+  const alone = languages.length === 1 && languages[0] === 'python' ? [] : ['"framework" is on an example written for Python alone'];
+
+  if (kindOf(framework) !== 'object') {
+    return [...alone, '"framework" is an object: { name, requests }'];
+  }
+
+  const held = framework as Record<string, unknown>;
+  const name = held['name'];
+  const requests = held['requests'];
+  const found = [
+    ...alone,
+    ...Object.keys(held)
+      .filter((key) => !FRAMEWORK_KEYS.includes(key))
+      .map((key) => `"framework" carries "${key}": it is a name and the requests of the test client`),
+  ];
+
+  if (typeof name !== 'string' || !/^[a-z][a-z0-9-]*$/.test(name)) {
+    found.push('"framework" needs a "name", the framework in lower case');
+  }
+
+  if (!Array.isArray(requests) || requests.length === 0) {
+    return [...found, '"framework" needs "requests", the requests its test client sends'];
+  }
+
+  return [...found, ...requests.flatMap((request, index) => frameworkRequestProblems(request, `request #${index + 1}`))];
+}
+
+function frameworkRequestProblems(request: unknown, at: string): string[] {
+  if (kindOf(request) !== 'object') {
+    return [`${at} is not an object`];
+  }
+
+  const held = request as Record<string, unknown>;
+  const status = held['status'];
+  const found = Object.keys(held)
+    .filter((key) => !FRAMEWORK_REQUEST_KEYS.includes(key))
+    .map((key) => `${at} carries "${key}": a request is ${FRAMEWORK_REQUEST_KEYS.join(', ')}`);
+
+  if (typeof held['method'] !== 'string' || !/^(?:GET|POST|PUT|PATCH|DELETE)$/.test(held['method'])) {
+    found.push(`${at} needs a "method"`);
+  }
+
+  if (typeof held['path'] !== 'string' || !held['path'].startsWith('/')) {
+    found.push(`${at} needs a "path" of the application, from its root`);
+  }
+
+  if (held['headers'] !== undefined && (kindOf(held['headers']) !== 'object' || Object.values(held['headers'] as object).some((value) => typeof value !== 'string'))) {
+    found.push(`${at}: "headers" are names and the strings they are sent with`);
+  }
+
+  if (typeof status !== 'number' || !Number.isInteger(status) || status < 100 || status > 599) {
+    found.push(`${at} needs the "status" the application answers with`);
+  }
+
+  return found;
+}
 
 /** One answer of the wire: a status and a JSON body, and nothing else — see `answerProblems`. */
 interface Answer {
@@ -172,6 +263,12 @@ interface Example {
    * no such thing.
    */
   laravel?: boolean;
+  /**
+   * An application of a Python framework (the Python SDK's
+   * `test_help_examples.py`): its test client sends `requests`, the SDK inside
+   * answers from `responses`. Python alone.
+   */
+  framework?: { name: string; requests: FrameworkRequest[] };
   regions: string[];
   responses: Answer[];
 }
@@ -1137,6 +1234,30 @@ describe('the help-example harness', () => {
     ]);
   });
 
+  it('takes a framework only on an example written for Python alone, and only a name and the requests of its test client', () => {
+    const asked = { method: 'POST', path: '/orders/42/email', headers: { 'X-Request-Id': 'req-1' }, status: 202, answer: { status: 'queued' } };
+
+    expect(frameworkProblems(undefined, ['node', 'php', 'python'])).toEqual([]);
+    expect(frameworkProblems({ name: 'fastapi', requests: [asked, { method: 'GET', path: '/runs/7', status: 200 }] }, ['python'])).toEqual([]);
+    expect(frameworkProblems({ name: 'fastapi', requests: [asked] }, ['node', 'python'])).toEqual([
+      '"framework" is on an example written for Python alone',
+    ]);
+    expect(frameworkProblems({ name: 'FastAPI', requests: [], app: 'main:app' }, ['python'])).toEqual([
+      '"framework" carries "app": it is a name and the requests of the test client',
+      '"framework" needs a "name", the framework in lower case',
+      '"framework" needs "requests", the requests its test client sends',
+    ]);
+    expect(frameworkProblems({ name: 'django', requests: [{ method: 'FETCH', path: 'orders', headers: { 'X-Count': 1 }, status: 2020, json: {} }, 'GET /'] }, ['python'])).toEqual([
+      'request #1 carries "json": a request is method, path, headers, body, status, answer',
+      'request #1 needs a "method"',
+      'request #1 needs a "path" of the application, from its root',
+      'request #1: "headers" are names and the strings they are sent with',
+      'request #1 needs the "status" the application answers with',
+      'request #2 is not an object',
+    ]);
+    expect(frameworkProblems('fastapi', ['python'])).toEqual(['"framework" is an object: { name, requests }']);
+  });
+
   it('holds the estimate of a call a budget refused by its rule, not by its value', () => {
     const refusal = { code: 'budget_exceeded', message: 'Budget 74438200973595137 (monthly) exceeded' };
     const rejected = (estimated: unknown, more: Record<string, unknown> = {}): Record<string, unknown> => ({
@@ -1325,6 +1446,7 @@ describe.each(ids())('help example %s', (id) => {
     expect(answerProblems(example.responses)).toEqual([]);
     expect([undefined, true], '"laravel" is true or absent').toContain(example.laravel);
     expect(example.laravel === true && example.languages.join() !== 'php', 'a Laravel example is written for PHP alone').toBe(false);
+    expect(frameworkProblems(example.framework, example.languages)).toEqual([]);
   });
 
   it('keeps the estimate of the call in an execution it shows refused by a budget', () => {

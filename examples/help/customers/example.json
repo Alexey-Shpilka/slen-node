@@ -2,7 +2,7 @@
   "id": "customers",
   "status": "ready",
   "summary": "End customers and their credits: create a customer, top the account up, read it, charge it for a service of your own, read one page of the statement and then every page of it — and the run of a customer whose account cannot pay for it, refused with insufficient_credits; then block the first one.",
-  "languages": ["node", "php"],
+  "languages": ["node", "php", "python"],
   "regions": ["client", "create", "top-up", "read", "charge", "statement", "statement-all", "refused", "block"],
   "responses": [
     {
