@@ -2,7 +2,7 @@
   "id": "testing",
   "status": "ready",
   "summary": "Testing your own code without a network: queue an answer on the SDK's test double, give the double to the SDK as its HTTP client, run the call, read back what was sent.",
-  "languages": ["node", "php"],
+  "languages": ["node", "php", "python"],
   "regions": ["double", "client", "call", "inspect"],
   "responses": []
 }

@@ -369,7 +369,20 @@ interface CallLine {
 /** This SDK's name in `contract/*.json`. */
 const SDK = 'typescript';
 
-/** `contract/calls.json` — the call table both SDKs read. */
+/** The SDKs the contract knows. A line of the call table names some of them, this one among them. */
+const SDKS: readonly string[] = ['php', 'python', 'typescript'];
+
+/**
+ * What is wrong with the `sdks` of a line of the call table, or `null`: a list
+ * of the SDKs the contract knows, each once, with this one among them.
+ */
+function sdksProblem(sdks: unknown): string | null {
+  const known = Array.isArray(sdks) && sdks.every((sdk) => SDKS.includes(sdk as string)) && new Set(sdks).size === sdks.length;
+
+  return known && sdks.includes(SDK) ? null : `\`sdks\` is not a list of ${SDKS.join(', ')}, each once, with ${SDK} among them`;
+}
+
+/** `contract/calls.json` — the call table every SDK reads. */
 const CALL_TABLE = readJson<{ calls: Record<string, CallLine> }>('calls.json').calls;
 
 /** The lines of the call table that name this SDK. */
@@ -1185,14 +1198,25 @@ describe('the call table of the contract test', () => {
         problems.push(`${name}: the operation is not \`METHOD /path\`: ${JSON.stringify(line.operation)}`);
       }
 
-      const sdks = Array.isArray(line.sdks) ? line.sdks : [];
+      const problem = sdksProblem(line.sdks);
 
-      if (sdks.length === 0 || sdks.some((sdk) => !['php', 'typescript'].includes(sdk)) || new Set(sdks).size !== sdks.length) {
-        problems.push(`${name}: \`sdks\` is not a list of php and typescript: ${JSON.stringify(line.sdks)}`);
+      if (problem !== null) {
+        problems.push(`${name}: ${problem}: ${JSON.stringify(line.sdks)}`);
       }
     }
 
     expect(problems).toEqual([]);
+  });
+
+  it('takes as the SDKs of a line a list of the SDKs the contract knows, each once, this one among them', () => {
+    expect(sdksProblem(['php', 'python', 'typescript'])).toBeNull();
+    expect(sdksProblem(['php', 'typescript'])).toBeNull();
+    expect(sdksProblem(['typescript'])).toBeNull();
+    expect(sdksProblem([])).not.toBeNull();
+    expect(sdksProblem(['php', 'python'])).not.toBeNull();
+    expect(sdksProblem(['typescript', 'typescript'])).not.toBeNull();
+    expect(sdksProblem(['typescript', 'ruby'])).not.toBeNull();
+    expect(sdksProblem('typescript')).not.toBeNull();
   });
 
   // The table is held against the code with no spec: each call goes where its

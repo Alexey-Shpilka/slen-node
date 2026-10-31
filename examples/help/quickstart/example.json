@@ -2,7 +2,7 @@
   "id": "quickstart",
   "status": "ready",
   "summary": "The first request through a flow: build the client, execute an operation under your own idempotency key, read the answer.",
-  "languages": ["node", "php"],
+  "languages": ["node", "php", "python"],
   "regions": ["client", "send", "result"],
   "responses": [
     {

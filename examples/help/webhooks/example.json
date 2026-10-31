@@ -1,8 +1,8 @@
 {
   "id": "webhooks",
   "status": "ready",
-  "summary": "A webhook received: the raw body and its Slen-Signature (signed in the example with the secret of its endpoint) read into a typed event with constructEvent(), the event told by its type, and a body that was changed after signing refused with no_matching_signature. No request is made.",
-  "languages": ["node", "php"],
+  "summary": "A webhook received: the raw body and its Slen-Signature (signed in the example with the secret of its endpoint) read into a typed event with constructEvent() (construct_event() in Python), the event told by its type, and a body that was changed after signing refused with no_matching_signature. No request is made.",
+  "languages": ["node", "php", "python"],
   "regions": ["request", "receive", "refused"],
   "responses": []
 }

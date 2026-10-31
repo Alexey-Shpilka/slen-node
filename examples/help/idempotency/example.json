@@ -2,7 +2,7 @@
   "id": "idempotency",
   "status": "ready",
   "summary": "A key that names the unit of work: the key of a queue job, a repeat of the job answered by the execution it opened (replayed), and the same key over another body refused with idempotency_conflict.",
-  "languages": ["node", "php"],
+  "languages": ["node", "php", "python"],
   "regions": ["client", "key", "send", "repeat", "conflict"],
   "responses": [
     {

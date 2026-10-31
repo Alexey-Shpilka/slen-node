@@ -2,7 +2,7 @@
   "id": "logging",
   "status": "ready",
   "summary": "The journal of the SDK: a logger handed to the SDK, one run through a flow, and the events it writes — the request and the answer, by route template and status, never a body, a key or a value of the path.",
-  "languages": ["node", "php"],
+  "languages": ["node", "php", "python"],
   "regions": ["logger", "client", "send"],
   "responses": [
     {
