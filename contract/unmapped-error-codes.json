@@ -35,6 +35,7 @@
         "organization_limit_reached",
         "member_not_found",
         "member_forbidden",
+        "member_suspended",
         "last_owner",
         "already_a_member",
         "invite_not_found",

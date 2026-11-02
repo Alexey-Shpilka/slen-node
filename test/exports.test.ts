@@ -55,6 +55,7 @@ describe('the public surface of @slen/sdk', () => {
         'OtlpSpanRecorder',
         'OverrunApprovalRequiredError',
         'OverrunStoppedError',
+        'PlanLimitError',
         'PolicyDeniedError',
         'ProviderError',
         'RateLimitError',

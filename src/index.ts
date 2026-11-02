@@ -23,6 +23,7 @@ export {
   OperationUncertainError,
   OverrunApprovalRequiredError,
   OverrunStoppedError,
+  PlanLimitError,
   PolicyDeniedError,
   ProviderError,
   RateLimitError,

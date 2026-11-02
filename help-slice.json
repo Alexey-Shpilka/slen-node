@@ -3544,6 +3544,22 @@
       "members": []
     },
     {
+      "name": "PlanLimitError",
+      "kind": "class",
+      "source": "src/errors.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [
+        "SlenError"
+      ],
+      "implements": [],
+      "signature": null,
+      "members": []
+    },
+    {
       "name": "PolicyDeniedError",
       "kind": "class",
       "source": "src/errors.ts",
