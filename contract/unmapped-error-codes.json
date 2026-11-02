@@ -21,7 +21,7 @@
       ]
     },
     "console": {
-      "reason": "Raised by the console and the configuration plane — sign-in and sessions, organizations, members and invites, projects, keys, policies, budgets, alerts, webhooks, provider connections and pools, flow authoring, approvals, notifications (channels, routes, subscriptions, the Telegram bot, the unsubscribe link). No SDK method calls those endpoints, so a type would have nobody to catch it.",
+      "reason": "Raised by the console and the configuration plane — sign-in and sessions, organizations, members and invites, projects, keys, policies, budgets, alerts, webhooks, provider connections and pools, flow authoring, approvals, notifications (channels, routes, subscriptions, the Telegram bot, the unsubscribe link), the payments of the plan (a checkout, a change, the portal — an owner's in the console, never a key's). No SDK method calls those endpoints, so a type would have nobody to catch it.",
       "codes": [
         "session_required",
         "invalid_token",
@@ -83,7 +83,12 @@
         "notification_link_expired",
         "notification_limit_reached",
         "notification_event_not_allowed",
-        "notification_unsubscribe_invalid"
+        "notification_unsubscribe_invalid",
+        "billing_unavailable",
+        "billing_owner_only",
+        "billing_payer_only",
+        "billing_checkout_not_found",
+        "billing_provider_error"
       ]
     }
   }
