@@ -2344,6 +2344,15 @@
           "signature": "duration_ms?: number | null"
         },
         {
+          "name": "history_paused",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "history_paused?: boolean"
+        },
+        {
           "name": "nodes",
           "kind": "property",
           "static": false,

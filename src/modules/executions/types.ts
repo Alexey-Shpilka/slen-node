@@ -109,6 +109,8 @@ export interface ExecutionTrace {
   started_at: string;
   finished_at?: string | null;
   duration_ms?: number | null;
+  /** The month's executions with history had run out: the run wrote no trace, `nodes` and `events` are empty. */
+  history_paused?: boolean;
   nodes: FlowExecutionNode[];
   events: FlowExecutionEvent[];
 }
