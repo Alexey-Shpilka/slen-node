@@ -3,7 +3,7 @@
   "language": "node",
   "package": {
     "name": "@slen/sdk",
-    "version": "0.4.0",
+    "version": "0.4.1",
     "manifest": "package.json",
     "runtime": {
       "name": "node",
@@ -2344,6 +2344,15 @@
           "signature": "duration_ms?: number | null"
         },
         {
+          "name": "history_paused",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "history_paused?: boolean"
+        },
+        {
           "name": "nodes",
           "kind": "property",
           "static": false,
@@ -3541,6 +3550,22 @@
       "extends": [],
       "implements": [],
       "signature": "ParkReason = 'queue_node' | 'approval' | 'rate_limit_queue' | 'async_dispatch' | 'provider_background'",
+      "members": []
+    },
+    {
+      "name": "PlanLimitError",
+      "kind": "class",
+      "source": "src/errors.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [
+        "SlenError"
+      ],
+      "implements": [],
+      "signature": null,
       "members": []
     },
     {

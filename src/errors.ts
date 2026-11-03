@@ -72,6 +72,9 @@ export class ConcurrencyLimitError extends SpendRefusedError {}
 
 export class CustomerNotFoundError extends SlenError {}
 
+/** The organization's plan said no (`plan_limit_reached`, `plan_feature_unavailable`); `details.required_plan` is the plan to upgrade to. */
+export class PlanLimitError extends SlenError {}
+
 /** 429: the key sent more requests than its rate limit allows. */
 export class RateLimitError extends SlenError {}
 

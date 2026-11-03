@@ -5,6 +5,7 @@ import {
   InsufficientCreditsError,
   InvalidRequestError,
   InvalidResponseError,
+  PlanLimitError,
   type SlenError,
   TimeoutError,
 } from '../../src/errors.js';
@@ -104,6 +105,29 @@ describe('customers.get(), create(), block(), unblock()', () => {
     expect(await customers.create('user_8421')).toEqual(customer({ accounts: [] }));
     expect(http.last()).toMatchObject({ method: 'PUT', url: `${BASE}/v1/customers/user_8421`, body: {} });
     expect(http.last()?.headers['idempotency-key']).toBeUndefined();
+  });
+
+  it('raises a new customer on a plan without customers as PlanLimitError, which names the plan to upgrade to', async () => {
+    const { customers, http } = modules();
+    const details = { feature: 'customers', plan: 'free', required_plan: 'pro' };
+    http.push({
+      status: 403,
+      body: {
+        error: {
+          code: 'plan_feature_unavailable',
+          message: "This organization's Free plan does not include customers.",
+          details,
+          request_id: 'req_1',
+        },
+      },
+    });
+
+    const error = await outcome(customers.create('user_8421'));
+
+    expect(error).toBeInstanceOf(PlanLimitError);
+    expect(error).toMatchObject({ code: 'plan_feature_unavailable', status: 403, details, requestId: 'req_1' });
+    expect((error as PlanLimitError).details['required_plan']).toBe('pro');
+    expect(http.requests).toHaveLength(1);
   });
 
   it('blocks with the reason when one is given, with an empty body when not', async () => {
