@@ -22,6 +22,8 @@ export interface ExecutionCache {
 export interface ExecutionCost {
   estimated: Money | null;
   actual: Money | null;
+  /** True when a provider billed something Slen could not price: `actual` is then what Slen knew. */
+  incomplete: boolean;
 }
 
 /** `GET /v1/executions/{id}/status`: the polling view of a run. Why it did not complete is `error_code`. */
@@ -58,6 +60,25 @@ export interface AttemptSummary {
   provider_request_id?: string | null;
   /** The model the attempt put on the wire. */
   model_code?: string | null;
+  /** The whole input, cache read and writes included; null when the attempt got no answer. */
+  input_tokens?: number | null;
+  output_tokens?: number | null;
+  cached_input_tokens?: number;
+  cache_write_tokens?: number;
+  cache_write_long_tokens?: number;
+  reasoning_tokens?: number;
+  tool_calls?: Record<string, number>;
+  cost_breakdown?: AttemptCostBreakdown | null;
+  cost_incomplete?: boolean;
+}
+
+export interface AttemptCostBreakdown {
+  input: Money;
+  cached_input: Money;
+  cache_write: Money;
+  output: Money;
+  tools: Record<string, Money>;
+  total: Money;
 }
 
 /** One node the run walked through. */

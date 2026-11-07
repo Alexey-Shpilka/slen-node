@@ -604,6 +604,75 @@
       ]
     },
     {
+      "name": "AttemptCostBreakdown",
+      "kind": "interface",
+      "source": "src/modules/executions/types.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "input",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "input: Money"
+        },
+        {
+          "name": "cached_input",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "cached_input: Money"
+        },
+        {
+          "name": "cache_write",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "cache_write: Money"
+        },
+        {
+          "name": "output",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "output: Money"
+        },
+        {
+          "name": "tools",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "tools: Record<string, Money>"
+        },
+        {
+          "name": "total",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "total: Money"
+        }
+      ]
+    },
+    {
       "name": "AttemptSummary",
       "kind": "interface",
       "source": "src/modules/executions/types.ts",
@@ -705,6 +774,87 @@
           "deprecated": false,
           "internal": false,
           "signature": "model_code?: string | null"
+        },
+        {
+          "name": "input_tokens",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "input_tokens?: number | null"
+        },
+        {
+          "name": "output_tokens",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "output_tokens?: number | null"
+        },
+        {
+          "name": "cached_input_tokens",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "cached_input_tokens?: number"
+        },
+        {
+          "name": "cache_write_tokens",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "cache_write_tokens?: number"
+        },
+        {
+          "name": "cache_write_long_tokens",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "cache_write_long_tokens?: number"
+        },
+        {
+          "name": "reasoning_tokens",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "reasoning_tokens?: number"
+        },
+        {
+          "name": "tool_calls",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "tool_calls?: Record<string, number>"
+        },
+        {
+          "name": "cost_breakdown",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "cost_breakdown?: AttemptCostBreakdown | null"
+        },
+        {
+          "name": "cost_incomplete",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "cost_incomplete?: boolean"
         }
       ]
     },
@@ -1867,6 +2017,15 @@
           "deprecated": false,
           "internal": false,
           "signature": "actual: Money | null"
+        },
+        {
+          "name": "incomplete",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "incomplete: boolean"
         }
       ]
     },

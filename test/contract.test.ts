@@ -1085,6 +1085,7 @@ const SHAPES: Record<string, string> = {
   ExecutionStatusView: 'ExecutionStatusView',
   NodeExecutionStatus: 'NodeExecutionStatus',
   AttemptSummary: 'AttemptSummary',
+  AttemptCostBreakdown: 'AttemptCostBreakdown',
   FlowExecutionNode: 'FlowExecutionNode',
   FlowExecutionEvent: 'FlowExecutionEvent',
   ExecutionTrace: 'FlowExecutionTrace',

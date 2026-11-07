@@ -29,7 +29,7 @@
           },
           "error_code": "budget_exceeded",
           "error_message": "Budget 74438200973595137 (monthly) exceeded",
-          "cost": { "estimated": "0.00061560", "actual": null },
+          "cost": { "estimated": "0.00061560", "actual": null, "incomplete": false },
           "cache": { "hit": false, "cached_at": null },
           "replayed": true,
           "waiting_on": null,

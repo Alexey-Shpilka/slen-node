@@ -141,7 +141,7 @@ describe('a span cannot carry a prompt', () => {
       error: null,
       error_code: null,
       error_message: SECRET_PROMPT,
-      cost: { estimated: '0.00412500', actual: null },
+      cost: { estimated: '0.00412500', actual: null, incomplete: false },
       cache: { hit: false, cached_at: null },
     };
 
