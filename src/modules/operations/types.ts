@@ -1,5 +1,5 @@
 import type { Id } from '../../wire.js';
-import type { ExecutionCache, ExecutionCost, ExecutionStatus, WaitingOn } from '../executions/types.js';
+import type { ExecutionCache, ExecutionCost, ExecutionStatus, ExecutionWarning, WaitingOn } from '../executions/types.js';
 
 /** The answer of `POST /v1/operations/execute`: the status view of the run, its `error` and whether it was `replayed`. */
 export interface ExecutionResult {
@@ -21,6 +21,7 @@ export interface ExecutionResult {
   replayed: boolean;
   waiting_on: WaitingOn | null;
   trace_url: string;
+  warnings: ExecutionWarning[];
   /** How long the server asks to wait before reading the run again. */
   retry_after_seconds?: number;
 }

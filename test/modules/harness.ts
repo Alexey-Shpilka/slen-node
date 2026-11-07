@@ -97,6 +97,7 @@ export function execution(fields: Partial<ExecutionResult> = {}): ExecutionResul
     replayed: false,
     waiting_on: null,
     trace_url: '/v1/executions/74438200973594700',
+    warnings: [],
     ...fields,
   };
 }
@@ -113,6 +114,7 @@ export function statusView(fields: Partial<ExecutionStatusView> = {}): Execution
     cache: { hit: false, cached_at: null },
     waiting_on: null,
     trace_url: '/v1/executions/74438200973594700',
+    warnings: [],
     ...fields,
   };
 }

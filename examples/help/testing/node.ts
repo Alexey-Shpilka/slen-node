@@ -14,6 +14,7 @@ const answer: ExecutionResult = {
   replayed: false,
   waiting_on: null,
   trace_url: '/v1/executions/74438200973594700',
+  warnings: [],
 };
 
 const http = new FakeFetch();

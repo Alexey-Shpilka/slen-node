@@ -18,6 +18,7 @@ export function execution(overrides: Partial<ExecutionResult> = {}): ExecutionRe
     replayed: false,
     waiting_on: null,
     trace_url: '/v1/executions/74438200973594700',
+    warnings: [],
     ...overrides,
   };
 }
@@ -38,6 +39,7 @@ export function trace(overrides: Partial<ExecutionTrace> = {}): ExecutionTrace {
     started_at: '2026-08-03T09:55:00+00:00',
     finished_at: '2026-08-03T09:55:02+00:00',
     duration_ms: 2140,
+    warnings: [],
     nodes: [
       {
         node_key: 'model_1',
@@ -45,6 +47,9 @@ export function trace(overrides: Partial<ExecutionTrace> = {}): ExecutionTrace {
         status: 'completed',
         output_port: 'success',
         cost: '0.01100000',
+        estimated_cost: '0.02700000',
+        cost_status: 'actual',
+        cost_incomplete: false,
         duration_ms: 1980,
         started_at: '2026-08-03T09:55:00+00:00',
         finished_at: '2026-08-03T09:55:02+00:00',
@@ -96,6 +101,9 @@ export function trace(overrides: Partial<ExecutionTrace> = {}): ExecutionTrace {
         // The flow ended here: there is no edge to have left by.
         output_port: null,
         cost: null,
+        estimated_cost: null,
+        cost_status: 'estimated',
+        cost_incomplete: false,
         duration_ms: 1,
         started_at: '2026-08-03T09:55:02+00:00',
         finished_at: '2026-08-03T09:55:02+00:00',
@@ -134,6 +142,7 @@ export function statusView(overrides: Partial<ExecutionStatusView> = {}): Execut
     cache: { hit: false, cached_at: null },
     waiting_on: null,
     trace_url: '/v1/executions/74438200973594700',
+    warnings: [],
     ...overrides,
   };
 }

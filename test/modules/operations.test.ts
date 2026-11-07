@@ -172,6 +172,18 @@ describe('operations.execute()', () => {
     ]);
   });
 
+  it('passes the warnings of a run through as the API sends them', async () => {
+    const { operations, http } = modules();
+    const warning = {
+      code: 'input_key_ignored' as const,
+      keys: ['tools', 'temperature'],
+      message: 'The input carries keys of a model call that the flow does not pass to the model: tools, temperature.',
+    };
+    http.push({ body: { data: execution({ warnings: [warning] }) } });
+
+    expect((await operations.execute('support.reply', INPUT)).warnings).toEqual([warning]);
+  });
+
   it('answers a run the flow parked with 202, and its span says waiting with nothing about the cache', async () => {
     const { operations, http, spans } = modules();
     const parked = execution({

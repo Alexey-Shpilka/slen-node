@@ -2225,6 +2225,15 @@
           "signature": "trace_url: string"
         },
         {
+          "name": "warnings",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "warnings: ExecutionWarning[]"
+        },
+        {
           "name": "retry_after_seconds",
           "kind": "property",
           "static": false,
@@ -2351,6 +2360,15 @@
           "deprecated": false,
           "internal": false,
           "signature": "trace_url: string"
+        },
+        {
+          "name": "warnings",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "warnings: ExecutionWarning[]"
         },
         {
           "name": "retry_after_seconds",
@@ -2512,6 +2530,15 @@
           "signature": "history_paused?: boolean"
         },
         {
+          "name": "warnings",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "warnings: ExecutionWarning[]"
+        },
+        {
           "name": "nodes",
           "kind": "property",
           "static": false,
@@ -2528,6 +2555,48 @@
           "deprecated": false,
           "internal": false,
           "signature": "events: FlowExecutionEvent[]"
+        }
+      ]
+    },
+    {
+      "name": "ExecutionWarning",
+      "kind": "interface",
+      "source": "src/modules/executions/types.ts",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "code",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "code: 'input_key_ignored'"
+        },
+        {
+          "name": "keys",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "keys?: string[]"
+        },
+        {
+          "name": "message",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "message: string"
         }
       ]
     },
@@ -2750,6 +2819,33 @@
           "deprecated": false,
           "internal": false,
           "signature": "cost?: Money | null"
+        },
+        {
+          "name": "estimated_cost",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "estimated_cost?: Money | null"
+        },
+        {
+          "name": "cost_status",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "cost_status?: 'estimated' | 'actual'"
+        },
+        {
+          "name": "cost_incomplete",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "cost_incomplete?: boolean"
         },
         {
           "name": "duration_ms",

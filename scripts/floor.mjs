@@ -35,6 +35,7 @@ const RUN = {
   replayed: false,
   waiting_on: { node_key: 'start', type: 'async_dispatch', resume_at: null },
   trace_url: '/v1/executions/74438200973594700',
+  warnings: [],
   retry_after_seconds: 1,
 };
 
