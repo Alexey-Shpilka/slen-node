@@ -864,7 +864,9 @@ function factsOfSchema(given: Schema): Facts {
     const closed = schema.enum ?? (schema.const === undefined ? undefined : [schema.const]);
 
     if (closed !== undefined) {
-      facts.literals = [...(facts.literals ?? []), ...closed.map(String)];
+      // A nullable closed list writes `null` among its values (`enum: [stored, …, null]`): that is `nullable`, not a value.
+      facts.nullable ||= closed.includes(null);
+      facts.literals = [...(facts.literals ?? []), ...closed.filter((value) => value !== null).map(String)];
     }
   };
 

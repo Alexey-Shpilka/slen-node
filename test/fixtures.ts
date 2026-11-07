@@ -79,6 +79,15 @@ export function trace(overrides: Partial<ExecutionTrace> = {}): ExecutionTrace {
             cost_incomplete: false,
           },
         ],
+        output: {
+          model: 'gpt-4o',
+          content: 'Your order ships on Monday.',
+          finish_reason: 'stop',
+          tool_calls: [],
+          usage: { input_tokens: 200, output_tokens: 50, tool_calls: { web_search: 1 } },
+        },
+        output_truncated: false,
+        output_stored: 'stored',
       },
       {
         node_key: 'return_1',
@@ -92,6 +101,9 @@ export function trace(overrides: Partial<ExecutionTrace> = {}): ExecutionTrace {
         finished_at: '2026-08-03T09:55:02+00:00',
         metadata: null,
         attempts: [],
+        output: null,
+        output_truncated: false,
+        output_stored: null,
       },
     ],
     events: [
