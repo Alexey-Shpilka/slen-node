@@ -100,6 +100,9 @@ export interface FlowExecutionNode {
   model?: string | null;
   /** The node's own decision or refusal; it can differ from the run's `error_code`. */
   code?: string | null;
+  output?: Record<string, unknown> | null;
+  output_truncated?: boolean;
+  output_stored?: 'stored' | 'disabled_by_project' | 'withheld' | 'history_paused' | null;
 }
 
 /** One line of the run's timeline. */

@@ -2822,6 +2822,33 @@
           "deprecated": false,
           "internal": false,
           "signature": "code?: string | null"
+        },
+        {
+          "name": "output",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "output?: Record<string, unknown> | null"
+        },
+        {
+          "name": "output_truncated",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "output_truncated?: boolean"
+        },
+        {
+          "name": "output_stored",
+          "kind": "property",
+          "static": false,
+          "optional": true,
+          "deprecated": false,
+          "internal": false,
+          "signature": "output_stored?: 'stored' | 'disabled_by_project' | 'withheld' | 'history_paused' | null"
         }
       ]
     },

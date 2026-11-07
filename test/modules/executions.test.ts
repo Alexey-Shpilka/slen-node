@@ -84,6 +84,38 @@ describe('executions.trace()', () => {
     expect(http.last()?.url).toBe(`https://sdk.example/api/v1/executions/${ID}`);
     expect(spans.spans).toEqual([]);
   });
+
+  it("passes a model node's kept answer through as the API sends it, and says when it was not kept", async () => {
+    const { executions, http } = modules();
+    const model = {
+      node_key: 'ask',
+      node_type: 'ai_model',
+      status: 'completed' as const,
+      started_at: '2026-10-17T12:00:00.000+00:00',
+      attempts: [],
+      output: { content: 'Your order ships on Monday.', finish_reason: 'stop', usage: { input_tokens: 120, output_tokens: 9 } },
+      output_truncated: true,
+      output_stored: 'stored' as const,
+    };
+    const refused = {
+      ...model,
+      node_key: 'ask_again',
+      status: 'failed' as const,
+      output_port: 'unavailable',
+      output: { error: { class: 'unavailable', code: 'pool_unavailable', http_status: 503, retry_after_seconds: null } },
+      output_truncated: false,
+    };
+    const kept = { ...model, node_key: 'ask_quietly', output: null, output_truncated: false, output_stored: 'disabled_by_project' as const };
+    http.push({ body: { data: { ...TRACE, nodes: [model, refused, kept] } } });
+
+    const nodes = (await executions.trace(ID)).nodes;
+
+    expect(nodes.map((node) => node.output_stored)).toEqual(['stored', 'stored', 'disabled_by_project']);
+    expect(nodes[0]?.output?.['content']).toBe('Your order ships on Monday.');
+    expect(nodes[0]?.output_truncated).toBe(true);
+    expect(nodes[1]?.output?.['error']).toEqual({ class: 'unavailable', code: 'pool_unavailable', http_status: 503, retry_after_seconds: null });
+    expect(nodes[2]?.output).toBeNull();
+  });
 });
 
 describe('executions.wait()', () => {
