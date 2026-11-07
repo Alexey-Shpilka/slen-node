@@ -24,6 +24,7 @@ const TRACE: ExecutionTrace = {
   started_at: '2026-10-17T12:00:00.000+00:00',
   finished_at: '2026-10-17T12:00:01.200+00:00',
   duration_ms: 1200,
+  warnings: [],
   nodes: [],
   events: [],
 };
@@ -115,6 +116,30 @@ describe('executions.trace()', () => {
     expect(nodes[0]?.output_truncated).toBe(true);
     expect(nodes[1]?.output?.['error']).toEqual({ class: 'unavailable', code: 'pool_unavailable', http_status: 503, retry_after_seconds: null });
     expect(nodes[2]?.output).toBeNull();
+  });
+
+  it("passes a node's estimate and, once its hold is captured, its fact through as the API sends them", async () => {
+    const { executions, http } = modules();
+    const node = {
+      node_key: 'ask',
+      node_type: 'ai_model',
+      status: 'completed' as const,
+      started_at: '2026-10-17T12:00:00.000+00:00',
+      attempts: [],
+      cost: '0.00412500',
+      estimated_cost: '0.00412500',
+      cost_status: 'estimated' as const,
+      cost_incomplete: false,
+    };
+    const settled = { ...node, node_key: 'ask_again', cost: '0.00398000', cost_status: 'actual' as const, cost_incomplete: true };
+    http.push({ body: { data: { ...TRACE, nodes: [node, settled] } } });
+
+    const nodes = (await executions.trace(ID)).nodes;
+
+    expect(nodes.map((one) => [one.cost, one.estimated_cost, one.cost_status, one.cost_incomplete])).toEqual([
+      ['0.00412500', '0.00412500', 'estimated', false],
+      ['0.00398000', '0.00412500', 'actual', true],
+    ]);
   });
 });
 

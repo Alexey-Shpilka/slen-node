@@ -1085,6 +1085,7 @@ const SHAPES: Record<string, string> = {
   ExecutionCost: 'ExecutionCost',
   ExecutionResult: 'ExecutionResult',
   ExecutionStatusView: 'ExecutionStatusView',
+  ExecutionWarning: 'ExecutionWarnings[]',
   NodeExecutionStatus: 'NodeExecutionStatus',
   AttemptSummary: 'AttemptSummary',
   AttemptCostBreakdown: 'AttemptCostBreakdown',

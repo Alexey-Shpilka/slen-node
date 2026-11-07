@@ -21,6 +21,7 @@
           "replayed": false,
           "waiting_on": null,
           "trace_url": "/v1/executions/74438200973594800",
+          "warnings": [],
           "retry_after_seconds": 2
         }
       }
@@ -54,7 +55,8 @@
           "cost": { "estimated": "0.01480000", "actual": null, "incomplete": false },
           "cache": { "hit": false, "cached_at": null },
           "waiting_on": null,
-          "trace_url": "/v1/executions/74438200973594800"
+          "trace_url": "/v1/executions/74438200973594800",
+          "warnings": []
         }
       }
     }

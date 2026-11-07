@@ -26,6 +26,13 @@ export interface ExecutionCost {
   incomplete: boolean;
 }
 
+/** What a run said about its request when it started; it went on. `input_key_ignored`: `keys` of a model call came in the input and no node reads them. */
+export interface ExecutionWarning {
+  code: 'input_key_ignored';
+  keys?: string[];
+  message: string;
+}
+
 /** `GET /v1/executions/{id}/status`: the polling view of a run. Why it did not complete is `error_code`. */
 export interface ExecutionStatusView {
   execution_id: Id;
@@ -40,6 +47,7 @@ export interface ExecutionStatusView {
   cache: ExecutionCache;
   waiting_on: WaitingOn | null;
   trace_url: string;
+  warnings: ExecutionWarning[];
   /** How long the server asks to wait before the next read; only while the run is still going to move. */
   retry_after_seconds?: number;
 }
@@ -81,7 +89,7 @@ export interface AttemptCostBreakdown {
   total: Money;
 }
 
-/** One node the run walked through. */
+/** One node the run walked through; its `cost` is the estimate until its hold is captured, then the fact (`cost_status`). */
 export interface FlowExecutionNode {
   node_key: string;
   /** The node type, left open: the backend adds types. */
@@ -90,6 +98,9 @@ export interface FlowExecutionNode {
   /** Which edge the node left by; null for a node the flow ended at. */
   output_port?: string | null;
   cost?: Money | null;
+  estimated_cost?: Money | null;
+  cost_status?: 'estimated' | 'actual';
+  cost_incomplete?: boolean;
   duration_ms?: number | null;
   started_at: string;
   finished_at?: string | null;
@@ -135,6 +146,7 @@ export interface ExecutionTrace {
   duration_ms?: number | null;
   /** The month's executions with history had run out: the run wrote no trace, `nodes` and `events` are empty. */
   history_paused?: boolean;
+  warnings: ExecutionWarning[];
   nodes: FlowExecutionNode[];
   events: FlowExecutionEvent[];
 }

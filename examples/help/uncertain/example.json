@@ -33,7 +33,8 @@
           "cache": { "hit": false, "cached_at": null },
           "replayed": true,
           "waiting_on": null,
-          "trace_url": "/v1/executions/74443702163234816"
+          "trace_url": "/v1/executions/74443702163234816",
+          "warnings": []
         }
       }
     }
