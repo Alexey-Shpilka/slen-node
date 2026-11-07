@@ -4,6 +4,10 @@ All notable changes to `@slen/sdk` are written here. The format follows [Keep a 
 
 ## [Unreleased]
 
+### Added
+- `ExecutionCost.incomplete`: `true` when a provider billed something Slen could not price for one of the run's calls — a usage field it does not know, a price tier, a cache write or a server tool without a price — and `actual` is then what Slen knew. Set together with `actual`; `false` until then. The API always sends it, so the field is required: an `ExecutionCost` written by hand — the answer a test double queues — needs it too.
+- On `AttemptSummary`, the attempts of a trace node: `input_tokens` (the whole input, the cache read and writes included) and `output_tokens` (the whole paid output, reasoning included); `cached_input_tokens`, `cache_write_tokens`, `cache_write_long_tokens` and `reasoning_tokens`, the parts of those; `tool_calls`, the paid server-tool calls by name (`{ web_search: 6 }`); `cost_breakdown`, an `AttemptCostBreakdown` — `input`, `cached_input`, `cache_write`, `output`, `tools` by name and `total` — null until the attempt is priced; `cost_incomplete`, the attempt's own `incomplete`. Optional, as the spec has them.
+
 ## [0.4.1] - 2026-11-02
 
 ### Added

@@ -30,7 +30,7 @@ const RUN = {
   error: null,
   error_code: null,
   error_message: null,
-  cost: { estimated: null, actual: null },
+  cost: { estimated: null, actual: null, incomplete: false },
   cache: { hit: false, cached_at: null },
   replayed: false,
   waiting_on: { node_key: 'start', type: 'async_dispatch', resume_at: null },

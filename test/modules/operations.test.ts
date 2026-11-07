@@ -152,7 +152,7 @@ describe('operations.execute()', () => {
 
   it('writes one span under the name of the call, with the run it answered', async () => {
     const { operations, http, spans } = modules();
-    http.push({ body: { data: execution({ cost: { estimated: '0.00412500', actual: null } }) } });
+    http.push({ body: { data: execution({ cost: { estimated: '0.00412500', actual: null, incomplete: false } }) } });
 
     await operations.execute('support.reply', INPUT);
 
@@ -288,7 +288,7 @@ describe('operations.executeAsync()', () => {
     const answer = execution({
       status: 'queued',
       output: null,
-      cost: { estimated: null, actual: null },
+      cost: { estimated: null, actual: null, incomplete: false },
       waiting_on: { node_key: 'start', type: 'async_dispatch', resume_at: null },
       retry_after_seconds: 2,
     });
@@ -301,7 +301,7 @@ describe('operations.executeAsync()', () => {
 
   it('keeps the name when a replayed key answers with the run as it is now, cost and all', async () => {
     const { operations, http, spans } = modules();
-    http.push({ body: { data: execution({ replayed: true, cost: { estimated: '0.004', actual: '0.003' } }) } });
+    http.push({ body: { data: execution({ replayed: true, cost: { estimated: '0.004', actual: '0.003', incomplete: false } }) } });
 
     await operations.executeAsync('support.reply', INPUT, { idempotencyKey: 'ticket-42:reply' });
 

@@ -19,7 +19,7 @@ const TRACE: ExecutionTrace = {
   status: 'completed',
   error_code: null,
   error_message: null,
-  cost: { estimated: '0.00412500', actual: '0.00398000' },
+  cost: { estimated: '0.00412500', actual: '0.00398000', incomplete: false },
   cache: { hit: false, cached_at: null },
   started_at: '2026-10-17T12:00:00.000+00:00',
   finished_at: '2026-10-17T12:00:01.200+00:00',
