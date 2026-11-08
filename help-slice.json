@@ -3831,7 +3831,7 @@
       "type_parameters": [],
       "extends": [],
       "implements": [],
-      "signature": "ParkReason = 'queue_node' | 'approval' | 'rate_limit_queue' | 'async_dispatch' | 'provider_background'",
+      "signature": "ParkReason = 'queue_node' | 'approval' | 'rate_limit_queue' | 'async_dispatch' | 'provider_background' | 'queue_slot'",
       "members": []
     },
     {
