@@ -4,6 +4,8 @@ All notable changes to `@slen/sdk` are written here. The format follows [Keep a 
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-11-09
+
 ### Added
 - `'queue_slot'` in `ParkReason`, and so in `WaitingOn.type`: the run waits for a slot of a Queue node's limit of calls at once. `execute()` answers such a run at once — `status: 'waiting'`, `retry_after_seconds` 2 — and the run goes on by itself when a slot is freed; `wait()` follows it as it follows any other wait. `resume_at` is the deadline: a run still without a slot then leaves by the node's `busy` port, and with nothing connected there it ends `rejected` with `error_code` `concurrency_limit_exceeded`. The README shows the wait.
 
@@ -68,7 +70,8 @@ No change of the API or of behaviour.
 
 The first tag; not published.
 
-[Unreleased]: https://github.com/Alexey-Shpilka/slen-node/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/Alexey-Shpilka/slen-node/compare/v0.5.1...HEAD
+[0.5.1]: https://github.com/Alexey-Shpilka/slen-node/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/Alexey-Shpilka/slen-node/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/Alexey-Shpilka/slen-node/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/Alexey-Shpilka/slen-node/compare/v0.3.1...v0.4.0
