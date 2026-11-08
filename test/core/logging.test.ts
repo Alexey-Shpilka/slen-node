@@ -24,6 +24,7 @@ describe('the journal of a request', () => {
       'slen.failed',
       'slen.wait.poll',
       'slen.wait.poll_failed',
+      'slen.execution.warnings',
       'slen.webhook.rejected',
     ]);
   });

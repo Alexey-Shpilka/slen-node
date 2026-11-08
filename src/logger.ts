@@ -24,6 +24,7 @@ export const LOG_EVENTS = Object.freeze({
   failed: 'slen.failed',
   waitPoll: 'slen.wait.poll',
   waitPollFailed: 'slen.wait.poll_failed',
+  executionWarnings: 'slen.execution.warnings',
   webhookRejected: 'slen.webhook.rejected',
 } as const);
 
@@ -40,6 +41,7 @@ const LEVELS: Readonly<Record<LogEvent, LogLevel>> = {
   [LOG_EVENTS.failed]: 'error',
   [LOG_EVENTS.waitPoll]: 'debug',
   [LOG_EVENTS.waitPollFailed]: 'warn',
+  [LOG_EVENTS.executionWarnings]: 'warn',
   [LOG_EVENTS.webhookRejected]: 'warn',
 };
 

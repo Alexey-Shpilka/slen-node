@@ -143,6 +143,29 @@ describe('executions.trace()', () => {
   });
 });
 
+describe('the warnings of a run', () => {
+  it('are written once for each read that carries them, and once for the state a wait answers with', async () => {
+    const { executions, http, records } = modules();
+    const warnings = [{ code: 'input_key_ignored' as const, keys: ['tools'], message: 'canary: the input carries tools.' }];
+    http
+      .push({ body: { data: statusView({ warnings }) } })
+      .push({ body: { data: { ...TRACE, warnings } } })
+      .push({ body: { data: queued({ status: 'running', retry_after_seconds: 1, warnings }) } })
+      .push({ body: { data: statusView({ warnings }) } })
+      .push({ body: { data: statusView() } });
+
+    await executions.get(ID);
+    await executions.trace(ID);
+    await executions.wait(ID);
+    await executions.get(ID);
+
+    const line = { level: 'warn', event: 'slen.execution.warnings', context: { execution_id: ID, warnings: [{ code: 'input_key_ignored', keys: ['tools'] }] } };
+    expect(http.requests).toHaveLength(5);
+    expect(records.filter((record) => record.event === 'slen.execution.warnings')).toEqual([line, line, line]);
+    expect(JSON.stringify(records)).not.toContain('canary');
+  });
+});
+
 describe('executions.wait()', () => {
   it('reads the run until it is over, at the pace the server asks for, and writes one span', async () => {
     const { executions, http, spans, clock } = modules();

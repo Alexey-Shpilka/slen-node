@@ -5,6 +5,7 @@ import { generateIdempotencyKey } from '../../idempotency.js';
 import { SpanScope } from '../../observability/scope.js';
 import type { WithRequestId } from '../../wire.js';
 import type { ModuleContext } from '../context.js';
+import { writeWarnings } from '../executions/warnings.js';
 import type { ExecutionResult } from './types.js';
 
 /** A scalar the flow reads as `context.<key>`. */
@@ -65,6 +66,7 @@ export class OperationsModule {
     try {
       const run = await this.#context.api.request<ExecutionResult>(request);
       span.execution(run);
+      writeWarnings(this.#context.config.logger, run);
 
       return run;
     } catch (error) {
