@@ -4,12 +4,17 @@ All notable changes to `@slen/sdk` are written here. The format follows [Keep a 
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-11-08
+
+### Changed
+- `FlowExecutionNode.cost` after the capture is the fact: the estimate the node's hold was taken on until the hold is captured, then what the provider billed — the sum of the call's attempts. `estimated_cost` keeps the estimate, `cost_status` says which of the two `cost` holds (`'estimated'`, `'actual'`), and `cost_incomplete` is `true` when the fact misses something the provider billed that Slen cannot price yet. The fact arrives up to a minute after the run ended. The three new fields are optional, as the spec has them.
+
 ### Added
+- `warnings` on `ExecutionResult`, `ExecutionStatusView` and `ExecutionTrace`: what the run said about its request when it started and went on with — a list of `ExecutionWarning` (`code`, `keys`, `message`), empty when there is nothing to say. `input_key_ignored`: the input carried keys of a model call (`tools`, `model`, `temperature`, …, named in `keys`) that no node of the flow passes to the model; the trace has the event `input_keys_ignored`. The API always sends it, so the field is required: an answer written by hand — the one a test double queues — needs it too. The SDK writes a list that is not empty to the journal: `slen.execution.warnings` (`LOG_EVENTS.executionWarnings`) at the warn level, one record for each answer — `execute()`, `executeAsync()`, `get()`, `trace()`, and the state a `wait()` answers with — carrying the run's `execution_id` and each warning's `code` and `keys`, never its message.
 - `ExecutionCost.incomplete`: `true` when a provider billed something Slen could not price for one of the run's calls — a usage field it does not know, a price tier, a cache write or a server tool without a price — and `actual` is then what Slen knew. Set together with `actual`; `false` until then. The API always sends it, so the field is required: an `ExecutionCost` written by hand — the answer a test double queues — needs it too.
 - On `AttemptSummary`, the attempts of a trace node: `input_tokens` (the whole input, the cache read and writes included) and `output_tokens` (the whole paid output, reasoning included); `cached_input_tokens`, `cache_write_tokens`, `cache_write_long_tokens` and `reasoning_tokens`, the parts of those; `tool_calls`, the paid server-tool calls by name (`{ web_search: 6 }`); `cost_breakdown`, an `AttemptCostBreakdown` — `input`, `cached_input`, `cache_write`, `output`, `tools` by name and `total` — null until the attempt is priced; `cost_incomplete`, the attempt's own `incomplete`. Optional, as the spec has them.
 - On `FlowExecutionNode`, the nodes of a trace: `output` — what a model node left, its answer on `success` / `tool_calls` (`content`, `finish_reason`, `usage`, `tool_calls`, …) or its `error` on a failure port (`{ class, code, http_status, message, provider, model, retry_after_seconds }`), as an open object; `output_truncated` — the kept output was cut to the limit (64 KB of JSON by default); `output_stored` — `'stored'`, `'disabled_by_project'` (the project keeps no model answers), `'withheld'` (grounded with Google Search: its `content` is not kept) or `'history_paused'`. Null for every other node; optional, as the spec has them — a trace of a backend that kept no outputs leaves them out.
-- `warnings` on `ExecutionResult`, `ExecutionStatusView` and `ExecutionTrace`: what the run said about its request when it started and went on with — a list of `ExecutionWarning` (`code`, `keys`, `message`), empty when there is nothing to say. `input_key_ignored`: the input carried keys of a model call (`tools`, `model`, `temperature`, …, named in `keys`) that no node of the flow passes to the model; the trace has the event `input_keys_ignored`. The API always sends it, so the field is required: an answer written by hand — the one a test double queues — needs it too. Types only: the SDK does not log it yet.
-- On `FlowExecutionNode`: `cost` is now the estimate the node's hold was taken on until the hold is captured, then what the provider billed — the sum of the call's attempts; `estimated_cost` keeps the estimate, `cost_status` says which of the two `cost` holds (`'estimated'`, `'actual'`), and `cost_incomplete` is `true` when the fact misses something the provider billed that Slen cannot price yet. The fact arrives up to a minute after the run ended. Optional, as the spec has them.
+- `model_retired` (403) becomes a `PolicyDeniedError`, as `model_not_allowed` does: a model its provider stopped listing, refused before any attempt — nothing was spent; the flow needs another model. Until now the API answered such a call with `model_not_allowed`; without the row the new code would fall back by status to `AuthenticationError`.
 - `pool_unavailable` (503) is in the contract copies, unmapped: a model node whose provider keys were all cooling down or refused. It leaves the node by its `unavailable` port; a run that ends on it carries it as its `error_code`, and as an HTTP error it falls back by status to `ProviderError`, like any 5xx without a row.
 
 ## [0.4.1] - 2026-11-02
@@ -57,7 +62,8 @@ No change of the API or of behaviour.
 
 The first tag; not published.
 
-[Unreleased]: https://github.com/Alexey-Shpilka/slen-node/compare/v0.4.1...HEAD
+[Unreleased]: https://github.com/Alexey-Shpilka/slen-node/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/Alexey-Shpilka/slen-node/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/Alexey-Shpilka/slen-node/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/Alexey-Shpilka/slen-node/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/Alexey-Shpilka/slen-node/compare/v0.3.0...v0.3.1

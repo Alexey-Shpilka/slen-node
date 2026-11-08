@@ -1,2 +1,2 @@
 /** @internal */
-export const SDK_VERSION = '0.4.1';
+export const SDK_VERSION = '0.5.0';
