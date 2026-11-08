@@ -78,6 +78,7 @@ export class PlanLimitError extends SlenError {}
 /** 429: the key sent more requests than its rate limit allows. */
 export class RateLimitError extends SlenError {}
 
+/** A policy of the project refused the call (`policy_denied`), or the model is not one it may call (`model_not_allowed`, `model_retired`). Nothing ran. */
 export class PolicyDeniedError extends SlenError {}
 
 /** 403 `customer_blocked`: the end customer of the run is blocked, so its new runs are refused. Nothing ran. */

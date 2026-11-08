@@ -65,7 +65,8 @@ if (run.status === 'completed') {
 - **The idempotency key is yours to choose**, derived from the unit of work (`ticket-42:reply`). The server runs a key once: a second request under it runs nothing and answers with that run as it is now (`replayed: true`). Without a key the SDK makes one up, which covers its own retries and nothing else. For a job of your own queue, `idempotencyKeyForJob(jobId, 'support.reply')` gives every attempt of the job the same key.
 - **A refusal is an answer or an error, depending on the flow.** A `reject` node answers `200` with `status: 'rejected'` and its code in `error_code` (`isRejected(run)`); a refusal of the platform the flow did not route is thrown (below). `failed` and `uncertain` are runs that broke — read `error_code`, and `error_message` to show or log.
 - `isCompleted(run)`, `isRejected(run)`, `isPending(run)` (`queued`, `waiting`, `running`) and `isFinished(run)` (anything else) read the status, as the methods of the same names do in PHP.
-- The money of the run's model calls is held and settled inside the flow. `cost.estimated` is known when a model call was authorized; `cost.actual` arrives a minute or two after the run ended, so the answer of a run that has just finished carries `null` there.
+- The money of the run's model calls is held and settled inside the flow. `cost.estimated` is known when a model call was authorized; `cost.actual` arrives a minute or two after the run ended, so the answer of a run that has just finished carries `null` there. `cost.incomplete` is `true` when a provider billed something Slen could not price for one of the calls; `actual` is then what Slen knew.
+- **`warnings`** is what the run said about its request and went on with, a list of `ExecutionWarning` (`code`, `message`, `keys`) — today `input_key_ignored`: the input carried keys of a model call (`tools`, `temperature`, …, in `keys`) that no node of the flow passes to the model. Empty when there is nothing to say; the SDK writes a non-empty list to the journal (`slen.execution.warnings`).
 
 `executeAsync()` takes the same arguments and answers at once with `status: 'queued'`, for a run that goes on in the background.
 
@@ -86,7 +87,7 @@ const finished = await slen.executions.wait(queued.execution_id, {
 
 `wait()` reads the run until it is over, at the pace the server asks for (`retry_after_seconds`; otherwise 1 s doubling up to 30 s). When the timeout is up it answers the last state it read, which may still be pending — that is not an error. A read that gets no answer, a 429 or a 5xx is told to `onPollError` and the wait goes on; any other failure is thrown at once. `timeoutSeconds` defaults to 300; `Infinity` waits without a ceiling and gives up after ten failed reads in a row. `signal` ends a wait.
 
-`slen.executions.get(id)` reads the run once; `slen.executions.trace(id)` reads the nodes it walked and its events.
+`slen.executions.get(id)` reads the run once; `slen.executions.trace(id)` reads the nodes it walked and its events. A node's `cost` is the estimate its hold was taken on until the hold is captured, then what the provider billed — `cost_status` says which (`estimated`, `actual`), `estimated_cost` keeps the estimate, and the fact arrives up to a minute after the run ended. A model node carries what it left in `output` — its answer, or its error on a failure port — cut to the limit when `output_truncated`, and `null` when it was not kept (`output_stored`: `disabled_by_project`, `withheld`, `history_paused`); its `attempts` carry their tokens and `cost_breakdown`. No span or journal record carries an answer.
 
 ## End customers
 
@@ -161,6 +162,7 @@ const slen = new Slen({ apiKey: process.env.SLEN_API_KEY, logger: console });
 | `slen.unauthorized` | error | a 401, or a 403 about the key |
 | `slen.failed` | error | a 5xx, an unreadable answer, or no answer after every attempt — with `error_type` |
 | `slen.wait.poll`, `slen.wait.poll_failed` | debug, warn | the reads of a wait |
+| `slen.execution.warnings` | warn | a run that said something about its request (`warnings`): one record for each answer that carries them — `execute()`, `executeAsync()`, `get()`, `trace()`, and the last state of a `wait()` — with `execution_id` and each warning's `code` and `keys`, never its message |
 | `slen.webhook.rejected` | warn | a webhook refused, with `reason` |
 
 A request is written by its route — `POST /v1/customers/{externalUserId}/charge`, never the values in it. The journal never carries the API key, the webhook secret, an idempotency key, a body, the server's error message, or a value of the path or the query. A logger that throws does not fail the call.
@@ -230,7 +232,7 @@ Every failure is a `SlenError` with `code`, `status`, `details`, `requestId` (wh
 | Error | Codes | Fallback |
 |---|---|---|
 | `AuthenticationError` | `invalid_api_key`, `insufficient_scope`, `not_authenticated`, `not_a_member`, `account_suspended` | any other 401 / 403 |
-| `PolicyDeniedError` | `policy_denied`, `model_not_allowed` | |
+| `PolicyDeniedError` | `policy_denied`, `model_not_allowed`, `model_retired` | |
 | `CustomerBlockedError` (a `PolicyDeniedError`) | `customer_blocked` | |
 | `SpendRefusedError` (the family below) | `budget_exceeded`, `operation_limit_exceeded`, `concurrency_limit_exceeded`, `insufficient_credits`, `overrun_stopped`, `overrun_approval_required` | any other 402 |
 | `RateLimitError` | `rate_limit_exceeded` | any other 429 |

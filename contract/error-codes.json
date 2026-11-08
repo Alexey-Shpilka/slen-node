@@ -43,6 +43,7 @@
     "rate_limit_exceeded": { "status": 429, "type": "RateLimit" },
     "policy_denied": { "status": 403, "type": "PolicyDenied" },
     "model_not_allowed": { "status": 403, "type": "PolicyDenied" },
+    "model_retired": { "status": 403, "type": "PolicyDenied" },
     "customer_blocked": { "status": 403, "type": "CustomerBlocked" },
     "idempotency_conflict": { "status": 409, "type": "IdempotencyConflict" },
     "idempotency_in_progress": { "status": 409, "type": "IdempotencyConflict" },

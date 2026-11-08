@@ -16,6 +16,7 @@ import {
   waitMs,
   type WaitOptions,
 } from './wait.js';
+import { writeWarnings } from './warnings.js';
 
 /** Reads a run: its status, a wait until it is over, its trace. */
 export class ExecutionsModule {
@@ -29,8 +30,11 @@ export class ExecutionsModule {
   }
 
   /** The polling view of one run, read once. Writes no span. @throws SlenError */
-  get(executionId: string, options: RequestOptions = {}): Promise<WithRequestId<ExecutionStatusView>> {
-    return this.#context.api.request<ExecutionStatusView>(read(ENDPOINTS.executionStatus, executionId, options));
+  async get(executionId: string, options: RequestOptions = {}): Promise<WithRequestId<ExecutionStatusView>> {
+    const run = await this.#context.api.request<ExecutionStatusView>(read(ENDPOINTS.executionStatus, executionId, options));
+    writeWarnings(this.#context.config.logger, run);
+
+    return run;
   }
 
   /** Reads the run until it is over, at the pace the server asks; at the timeout, answers the last state read. @throws SlenError */
@@ -43,6 +47,7 @@ export class ExecutionsModule {
     try {
       const run = await this.#poll(executionId, options, progress);
       span.execution(run);
+      writeWarnings(this.#context.config.logger, run);
 
       return run;
     } catch (error) {
@@ -53,8 +58,11 @@ export class ExecutionsModule {
   }
 
   /** The trace of one run: every node, event and provider attempt. @throws SlenError */
-  trace(executionId: string, options: RequestOptions = {}): Promise<WithRequestId<ExecutionTrace>> {
-    return this.#context.api.request<ExecutionTrace>(read(ENDPOINTS.executionTrace, executionId, options));
+  async trace(executionId: string, options: RequestOptions = {}): Promise<WithRequestId<ExecutionTrace>> {
+    const trace = await this.#context.api.request<ExecutionTrace>(read(ENDPOINTS.executionTrace, executionId, options));
+    writeWarnings(this.#context.config.logger, trace);
+
+    return trace;
   }
 
   async #poll(executionId: string, options: WaitOptions, progress: Progress): Promise<WithRequestId<ExecutionStatusView>> {

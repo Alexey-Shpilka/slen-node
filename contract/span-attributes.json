@@ -14,7 +14,7 @@
   ],
   "outcomes": {
     "ok": "the server did the thing",
-    "refused": "the control plane said no — a decision, not a breakage: money (any 402, whichever ceiling), a policy (403 `policy_denied`, `model_not_allowed`, `customer_blocked`), a flow that rejected",
+    "refused": "the control plane said no — a decision, not a breakage: money (any 402, whichever ceiling), a policy (403 `policy_denied`, `model_not_allowed`, `model_retired`, `customer_blocked`), a flow that rejected",
     "error": "it broke, or was not let in: transport, provider, validation, a key that was refused (401, 403), the key's rate limit (429), anything else thrown — and a flow run that ended `failed` or `uncertain`, even when that arrived with a 200"
   },
   "operations": {

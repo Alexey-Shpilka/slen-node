@@ -3,7 +3,7 @@
   "language": "node",
   "package": {
     "name": "@slen/sdk",
-    "version": "0.4.1",
+    "version": "0.5.0",
     "manifest": "package.json",
     "runtime": {
       "name": "node",
@@ -3177,7 +3177,7 @@
       "type_parameters": [],
       "extends": [],
       "implements": [],
-      "signature": "LOG_EVENTS: Readonly<{ readonly request: \"slen.request\"; readonly response: \"slen.response\"; readonly retry: \"slen.retry\"; readonly refused: \"slen.refused\"; readonly unauthorized: \"slen.unauthorized\"; readonly failed: \"slen.failed\"; readonly waitPoll: \"slen.wait.poll\"; readonly waitPollFailed: \"slen.wait.poll_failed\"; readonly webhookRejected: \"slen.webhook.rejected\"; }>",
+      "signature": "LOG_EVENTS: Readonly<{ readonly request: \"slen.request\"; readonly response: \"slen.response\"; readonly retry: \"slen.retry\"; readonly refused: \"slen.refused\"; readonly unauthorized: \"slen.unauthorized\"; readonly failed: \"slen.failed\"; readonly waitPoll: \"slen.wait.poll\"; readonly waitPollFailed: \"slen.wait.poll_failed\"; readonly executionWarnings: \"slen.execution.warnings\"; readonly webhookRejected: \"slen.webhook.rejected\"; }>",
       "members": []
     },
     {

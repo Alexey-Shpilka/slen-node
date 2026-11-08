@@ -7,6 +7,7 @@ import {
   ServiceUnavailableError,
   type SlenError,
 } from '../../src/errors.js';
+import type { ExecutionWarning } from '../../src/modules/executions/types.js';
 import { isRejected } from '../../src/modules/executions/wait.js';
 import { Slen } from '../../src/slen.js';
 import { FakeFetch } from '../../src/testing/index.js';
@@ -182,6 +183,36 @@ describe('operations.execute()', () => {
     http.push({ body: { data: execution({ warnings: [warning] }) } });
 
     expect((await operations.execute('support.reply', INPUT)).warnings).toEqual([warning]);
+  });
+
+  it('writes one warning for each run that said something about its request: its codes and keys, never the message', async () => {
+    const { operations, http, records } = modules();
+    const warnings = [
+      { code: 'input_key_ignored', keys: ['tools', 'temperature'], message: 'canary: the input carries tools, temperature.' },
+      { code: 'later', message: 'canary: another.' },
+    ] as unknown as ExecutionWarning[];
+    http
+      .push({ body: { data: execution({ warnings }) } })
+      .push({ status: 202, body: { data: execution({ status: 'queued', output: null, warnings }) } })
+      .push({ body: { data: execution() } });
+
+    await operations.execute('support.reply', INPUT);
+    await operations.executeAsync('support.reply', INPUT);
+    await operations.execute('support.reply', INPUT);
+
+    const line = {
+      level: 'warn',
+      event: 'slen.execution.warnings',
+      context: {
+        execution_id: '74438200973594700',
+        warnings: [
+          { code: 'input_key_ignored', keys: ['tools', 'temperature'] },
+          { code: 'later', keys: null },
+        ],
+      },
+    };
+    expect(records.filter((record) => record.event === 'slen.execution.warnings')).toEqual([line, line]);
+    expect(JSON.stringify(records)).not.toContain('canary');
   });
 
   it('answers a run the flow parked with 202, and its span says waiting with nothing about the cache', async () => {
