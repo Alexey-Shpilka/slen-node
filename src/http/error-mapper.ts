@@ -46,6 +46,7 @@ const BY_CODE: Readonly<Record<string, SlenErrorType>> = Object.freeze({
   rate_limit_exceeded: RateLimitError,
   policy_denied: PolicyDeniedError,
   model_not_allowed: PolicyDeniedError,
+  model_retired: PolicyDeniedError,
   customer_blocked: CustomerBlockedError,
   idempotency_conflict: IdempotencyConflictError,
   idempotency_in_progress: IdempotencyConflictError,
