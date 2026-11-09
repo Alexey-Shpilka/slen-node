@@ -67,7 +67,7 @@ export class OverrunApprovalRequiredError extends SpendRefusedError {}
 /** One operation would cost more than a `per_operation` budget allows. */
 export class OperationLimitExceededError extends SpendRefusedError {}
 
-/** A `concurrency` budget has every slot taken; passes when one is freed. */
+/** A Queue node's limit of calls at once is full and its `busy` port leads nowhere; `details` is that port's output. */
 export class ConcurrencyLimitError extends SpendRefusedError {}
 
 export class CustomerNotFoundError extends SlenError {}

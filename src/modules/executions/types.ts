@@ -2,12 +2,13 @@ import type { Id, Money } from '../../wire.js';
 
 export type ExecutionStatus = 'running' | 'queued' | 'waiting' | 'completed' | 'rejected' | 'failed' | 'uncertain';
 
-/** What a `waiting` or `queued` run waits on; `provider_background` is a provider call running as a background job. */
-export type ParkReason = 'queue_node' | 'approval' | 'rate_limit_queue' | 'async_dispatch' | 'provider_background';
+/** What a `waiting` or `queued` run waits on; `provider_background` is a background provider call, `queue_slot` a slot under a Queue node's limit. */
+export type ParkReason = 'queue_node' | 'approval' | 'rate_limit_queue' | 'async_dispatch' | 'provider_background' | 'queue_slot';
 
 export interface WaitingOn {
   node_key: string;
   type: ParkReason;
+  /** When the run is picked up again, when known; for `queue_slot` the deadline, when a run still without a slot leaves by the node's `busy` port. */
   resume_at: string | null;
 }
 

@@ -3,7 +3,7 @@
   "language": "node",
   "package": {
     "name": "@slen/sdk",
-    "version": "0.5.0",
+    "version": "0.5.1",
     "manifest": "package.json",
     "runtime": {
       "name": "node",
@@ -3831,7 +3831,7 @@
       "type_parameters": [],
       "extends": [],
       "implements": [],
-      "signature": "ParkReason = 'queue_node' | 'approval' | 'rate_limit_queue' | 'async_dispatch' | 'provider_background'",
+      "signature": "ParkReason = 'queue_node' | 'approval' | 'rate_limit_queue' | 'async_dispatch' | 'provider_background' | 'queue_slot'",
       "members": []
     },
     {

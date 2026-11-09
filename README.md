@@ -87,6 +87,27 @@ const finished = await slen.executions.wait(queued.execution_id, {
 
 `wait()` reads the run until it is over, at the pace the server asks for (`retry_after_seconds`; otherwise 1 s doubling up to 30 s). When the timeout is up it answers the last state it read, which may still be pending — that is not an error. A read that gets no answer, a 429 or a 5xx is told to `onPollError` and the wait goes on; any other failure is thrown at once. `timeoutSeconds` defaults to 300; `Infinity` waits without a ceiling and gives up after ten failed reads in a row. `signal` ends a wait.
 
+**Waiting for a slot.** A Queue node that limits calls at once — at most three model calls of one customer, say — never holds the call while its limit is full: `execute()` answers at once with `status: 'waiting'` and `waiting_on.type: 'queue_slot'`, and the run goes on by itself when a slot is freed, in turn.
+
+```ts
+const run = await slen.operations.execute(
+  'support.reply',
+  { messages: [{ role: 'user', content: 'Where is my order?' }] },
+  { customer: 'user_8421', idempotencyKey: 'ticket-42:reply' },
+);
+
+if (run.waiting_on?.type === 'queue_slot') {
+  // In a queue worker, not in a request handler: the run waits its turn behind the customer's other calls.
+  const finished = await slen.executions.wait(run.execution_id, { timeoutSeconds: 120 });
+
+  if (finished.error_code === 'concurrency_limit_exceeded') {
+    console.warn('no slot was freed before the deadline');
+  }
+}
+```
+
+`wait()` needs nothing more: the answer asks for a read every 2 s (`retry_after_seconds`), since a freed slot wakes the run within seconds. `waiting_on.resume_at` is the deadline — a run still without a slot then leaves by the node's `busy` port, and when nothing is connected there it ends `rejected` with `error_code` `concurrency_limit_exceeded`. A node that refuses at once, or whose queue is full, ends the run during the call: `execute()` throws `ConcurrencyLimitError`, and its `details` are the node's `busy` output — `reason` (`refused`, `queue_full`), `key`, `limit`, `in_flight`, `waiting`, `waited_seconds`.
+
 `slen.executions.get(id)` reads the run once; `slen.executions.trace(id)` reads the nodes it walked and its events. A node's `cost` is the estimate its hold was taken on until the hold is captured, then what the provider billed — `cost_status` says which (`estimated`, `actual`), `estimated_cost` keeps the estimate, and the fact arrives up to a minute after the run ended. A model node carries what it left in `output` — its answer, or its error on a failure port — cut to the limit when `output_truncated`, and `null` when it was not kept (`output_stored`: `disabled_by_project`, `withheld`, `history_paused`); its `attempts` carry their tokens and `cost_breakdown`. No span or journal record carries an answer.
 
 ## End customers
