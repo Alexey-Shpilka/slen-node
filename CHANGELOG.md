@@ -4,6 +4,9 @@ All notable changes to `@slen/sdk` are written here. The format follows [Keep a 
 
 ## [Unreleased]
 
+### Added
+- `organization_suspended` (403) is in the contract copies, unmapped: Slen has suspended the organization of the key. Every request of the key is refused with it until the suspension is lifted — nothing in the request can be changed to help, and the same key works again afterwards — and it falls back by status to `AuthenticationError`, like any 403 without a row.
+
 ## [0.5.1] - 2026-11-09
 
 ### Added
